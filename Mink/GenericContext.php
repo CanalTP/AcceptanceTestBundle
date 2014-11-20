@@ -7,6 +7,8 @@ use Behat\MinkExtension\Context\MinkContext;
 class GenericContext extends MinkContext
 {
     /**
+     * Log with a role
+     * 
      * @Given /^(?:|I am )logged as "(?P<role>(?:[^"]|\\")*)"$/
      */
     public function logAs($role)
@@ -22,6 +24,46 @@ class GenericContext extends MinkContext
                 break;
             case 'user':
                 break;
+        }
+    }
+    
+    /**
+     * Using a specific environment and client
+     * 
+     * @Given /^(?:|(?:|I am )on "(?P<environment>(?:[^"]|\\")*)" )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in "(?P<locale>(?:[^"]|\\")*)")$/
+     */
+    public function forTheClient($client, $environment = '', $locale = '')
+    {
+        $clients = array('Amiens','Breizhgo','CTP','Destineo','Jvmalin','Plugnplay','Star','Vitici');           // A dynamiser
+        $environments = array('local','dev','internal','customer');                                             // A dynamiser
+        $locales = array('fr','en','nl','br','de');                                                             // A dynamiser
+        if (!in_array($client, $clients)) {
+            throw new \Exception('Client "'.$client.'" undefined.');
+        }
+        if (empty($environment)) {
+            $environment = 'local';
+        }
+        if (!in_array($environment, $environments)) {
+            throw new \Exception('Environment "'.$environment.'" undefined.');
+        }
+        if (empty($locale)) {
+            $locale = 'fr';
+        }
+        if (!in_array($locale, $locales)) {
+            throw new \Exception('Locale "'.$locale.'" undefined.');
+        }
+        $this->setMinkParameter('base_url', strtr('http://nmp-ihm.'.strtolower($client).'.'.strtolower($environment).'.canaltp.fr/'.$locale, array(' ', '')));
+    }
+    
+    /**
+     * Enable or disable JS
+     * 
+     * @Given /^With(?P<suffix>(?:|out)) Javascript$/
+     */
+    public function withJavascript($suffix)
+    {
+        if ($suffix == 'out') {
+            // Use Goutte (default: Selenium)
         }
     }
     
