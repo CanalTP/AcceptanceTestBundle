@@ -5,7 +5,7 @@ namespace CanalTP\NmpAcceptanceTestBundle\Mink;
 use Behat\MinkExtension\Context\MinkContext;
 
 class GenericContext extends MinkContext
-{
+{        
     /**
      * Log with a role
      * 
@@ -28,23 +28,23 @@ class GenericContext extends MinkContext
     }
     
     /**
-     * Using a specific environment and client
+     * Using a specific server, client and locale
      * 
-     * @Given /^(?:|(?:|I am )on "(?P<environment>(?:[^"]|\\")*)" )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in "(?P<locale>(?:[^"]|\\")*)")$/
+     * @Given /^(?:|(?:|I am )on "(?P<server>(?:[^"]|\\")*)" )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in "(?P<locale>(?:[^"]|\\")*)")$/
      */
-    public function forTheClient($client, $environment = '', $locale = '')
+    public function forTheCustomer($client, $server = '', $locale = '')
     {
-        $clients = array('Amiens','Breizhgo','CTP','Destineo','Jvmalin','Plugnplay','Star','Vitici');           // A dynamiser
-        $environments = array('local','dev','internal','customer');                                             // A dynamiser
+        $clients = array('Amiens','Breizhgo','Ctp','Destineo','Jvmalin','Plugnplay','Star','Vitici');           // A dynamiser
+        $servers = array('local','dev','internal','customer');                                                  // A dynamiser
         $locales = array('fr','en','nl','br','de');                                                             // A dynamiser
         if (!in_array($client, $clients)) {
-            throw new \Exception('Client "'.$client.'" undefined.');
+            throw new \Exception('Customer "'.$client.'" undefined.');
         }
-        if (empty($environment)) {
-            $environment = 'local';
+        if (empty($server)) {
+            $server = 'local';
         }
-        if (!in_array($environment, $environments)) {
-            throw new \Exception('Environment "'.$environment.'" undefined.');
+        if (!in_array($server, $servers)) {
+            throw new \Exception('Server "'.$server.'" undefined.');
         }
         if (empty($locale)) {
             $locale = 'fr';
@@ -52,7 +52,7 @@ class GenericContext extends MinkContext
         if (!in_array($locale, $locales)) {
             throw new \Exception('Locale "'.$locale.'" undefined.');
         }
-        $this->setMinkParameter('base_url', strtr('http://nmp-ihm.'.strtolower($client).'.'.strtolower($environment).'.canaltp.fr/'.$locale, array(' ', '')));
+        $this->setMinkParameter('base_url', strtr('http://nmp-ihm.'.strtolower($client).'.'.strtolower($server).'.canaltp.fr/'.$locale, array(' ', '')));
     }
     
     /**
