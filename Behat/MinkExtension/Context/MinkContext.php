@@ -1,11 +1,55 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Mink;
+namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
 
-use Behat\MinkExtension\Context\MinkContext;
+use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
+use Behat\Behat\Context\SnippetAcceptingContext;
+use Symfony\Component\HttpKernel\KernelInterface;
 
-class GenericContext extends MinkContext
-{        
+class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
+{
+    /**
+     * Behat additional options
+     * @var array $options
+     */
+    public static $options;
+    /**
+     * Allowed values for addtional options
+     * @var array $allowed
+     */
+    public static $allowed;
+    /**
+     * Application Kernel
+     * @var KernelInterface $kernel
+     */
+    private $kernel;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setKernel(KernelInterface $kernel)
+    {
+        $this->kernel = $kernel;
+        $container = $this->kernel->getContainer();
+        if (self::$options === null) {
+            self::$options = $container->getParameter('behat.options');
+        }
+        if (self::$allowed === null) {
+            self::$allowed = array(
+                'clients' => $container->getParameter('behat.clients'),
+                'servers' => $container->getParameter('behat.servers'),
+                'locales' => $container->getParameter('behat.locales')
+            );
+        }
+    }
+    
+    /**
+     * Behat additional options initializer
+     */
+    public function __construct() {
+        $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
+    }
+    
     /**
      * Log with a role
      * 
@@ -32,25 +76,20 @@ class GenericContext extends MinkContext
      * 
      * @Given /^(?:|(?:|I am )on "(?P<server>(?:[^"]|\\")*)" )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in "(?P<locale>(?:[^"]|\\")*)")$/
      */
-    public function forTheCustomer($client, $server = '', $locale = '')
+    public function forTheClient($client, $server = '', $locale = '')
     {
-        $clients = array('Amiens','Breizhgo','Ctp','Destineo','Jvmalin','Plugnplay','Star','Vitici');           // A dynamiser
-        $servers = array('local','dev','internal','customer');                                                  // A dynamiser
-        $locales = array('fr','en','nl','br','de');                                                             // A dynamiser
-        if (!in_array($client, $clients)) {
-            throw new \Exception('Customer "'.$client.'" undefined.');
+        if (!in_array($client, self::$allowed['clients'])) {
+            throw new \Exception('Website client "'.$client.'" not found.');
+        }        
+        if (!in_array($server, self::$allowed['servers']) && !empty($server)) {
+            throw new \Exception('Website server "'.$server.'" not found.');
+        } else {
+            $server = self::$options['server'];
         }
-        if (empty($server)) {
-            $server = 'local';
-        }
-        if (!in_array($server, $servers)) {
-            throw new \Exception('Server "'.$server.'" undefined.');
-        }
-        if (empty($locale)) {
-            $locale = 'fr';
-        }
-        if (!in_array($locale, $locales)) {
-            throw new \Exception('Locale "'.$locale.'" undefined.');
+        if (!in_array($locale, self::$allowed['locales']) && !empty($locale)) {
+            throw new \Exception('Website locale "'.$locale.'" not found.');
+        } else {
+            $locale = self::$options['locale'];
         }
         $this->setMinkParameter('base_url', strtr('http://nmp-ihm.'.strtolower($client).'.'.strtolower($server).'.canaltp.fr/'.$locale, array(' ', '')));
     }
