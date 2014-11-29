@@ -18,12 +18,39 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('canal_tp_nmp_acceptance_test');
-
-        // Here you should define the parameters that are allowed to
-        // configure your bundle. See the documentation linked above for
-        // more information on that topic.
-
+        $treeBuilder->root('canal_tp_nmp_acceptance_test')
+            ->children()
+                ->arrayNode('clients')
+                    ->isRequired()
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('servers')
+                    ->isRequired()
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('locales')
+                    ->isRequired()
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->arrayNode('options')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->scalarNode('client')
+                            ->defaultValue('Ctp')
+                        ->end()
+                        ->scalarNode('server')
+                            ->defaultValue('local')
+                        ->end()
+                        ->scalarNode('locale')
+                            ->defaultValue('fr')
+                        ->end()
+                    ->end()
+                ->end()
+            ->end()
+        ->end();
         return $treeBuilder;
     }
 }
