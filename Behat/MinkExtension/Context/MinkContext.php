@@ -141,6 +141,32 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
     }
     
     /**
+     * Checks, that element children with specified CSS are on page.
+     * 
+     * @param type $element
+     * @param type $children
+     */
+    public function assertElementChildrenOnPage($element, $children = array())
+    {
+        foreach ($children as $child) {
+            $this->assertElementOnPage($element . ' ' . $child);
+        }
+    }
+    
+    /**
+     * Checks, that element children with specified CSS are not on page.
+     * 
+     * @param type $element
+     * @param type $children
+     */
+    public function assertElementChildrenNotOnPage($element, $children = array())
+    {
+        foreach ($children as $child) {
+            $this->assertElementNotOnPage($element . ' ' . $child);
+        }
+    }
+    
+    /**
      * Checks, that element childrens with specified CSS are visible on page.
      */
     public function assertElementChildrensVisible($element, $childrens = array())
@@ -158,5 +184,11 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
         foreach ($childrens as $children) {
             $this->assertElementNotVisible($element.' '.$children);
         }
+    }
+    
+    protected function getTestCaseUrl($name)
+    {
+        //$container = $this->getContainer();
+        //echo $container->getParameter('test_cases');
     }
 }
