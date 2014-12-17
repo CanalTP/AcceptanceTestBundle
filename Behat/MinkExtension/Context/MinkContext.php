@@ -6,20 +6,29 @@ use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 
+/**
+ * Mink context for Behat BDD tool.
+ * Provides Mink integration and base step definitions with additional options.
+ *
+ * @author Vincent Catillon <vincent.catillon@canaltp.fr>
+ */
 class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
 {
     /**
      * Behat additional options
+     * 
      * @var array $options
      */
     public static $options;
     /**
      * Allowed values for addtional options
+     * 
      * @var array $allowed
      */
     public static $allowed;
     /**
      * Application Kernel
+     * 
      * @var KernelInterface $kernel
      */
     private $kernel;
@@ -76,7 +85,7 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
      * 
      * @Given /^(?:|(?:|I am )on "(?P<server>(?:[^"]|\\")*)" )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in "(?P<locale>(?:[^"]|\\")*)")$/
      */
-    public function forTheClient($client, $server = '', $locale = '')
+    public function forTheClient($client, $server = null, $locale = null)
     {
         if (!in_array($client, self::$allowed['clients'])) {
             throw new \Exception('Website client "'.$client.'" not found.');
@@ -86,12 +95,16 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
         } else {
             $server = self::$options['server'];
         }
-        if (!in_array($locale, self::$allowed['locales']) && !empty($locale)) {
+        if ($locale !== '' && !in_array($locale, self::$allowed['locales']) && !empty($locale)) {
             throw new \Exception('Website locale "'.$locale.'" not found.');
-        } else {
+        } elseif ($locale !== '') {
             $locale = self::$options['locale'];
         }
-        $this->setMinkParameter('base_url', strtr('http://nmp-ihm.'.strtolower($client).'.'.strtolower($server).'.canaltp.fr/'.$locale, array(' ', '')));
+        $baseUrl = 'http://nmp-ihm.'.strtolower($client).'.'.strtolower($server).'.canaltp.fr';
+        if (trim($locale) !== '') {
+            $baseUrl .= '/'.$locale;
+        }
+        $this->setMinkParameter('base_url', strtr($baseUrl, array(' ', '')));
     }
     
     /**
@@ -143,8 +156,8 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
     /**
      * Checks, that element children with specified CSS are on page.
      * 
-     * @param type $element
-     * @param type $children
+     * @param string $element
+     * @param array $children
      */
     public function assertElementChildrenOnPage($element, $children = array())
     {
@@ -156,8 +169,8 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
     /**
      * Checks, that element children with specified CSS are not on page.
      * 
-     * @param type $element
-     * @param type $children
+     * @param string $element
+     * @param array $children
      */
     public function assertElementChildrenNotOnPage($element, $children = array())
     {
@@ -168,6 +181,9 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
     
     /**
      * Checks, that element childrens with specified CSS are visible on page.
+     * 
+     * @param string $element
+     * @param array $childrens
      */
     public function assertElementChildrensVisible($element, $childrens = array())
     {
@@ -178,6 +194,9 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
     
     /**
      * Checks, that element childrens with specified CSS are not visible on page.
+     * 
+     * @param string $element
+     * @param array $childrens
      */
     public function assertElementChildrensNotVisible($element, $childrens = array())
     {
@@ -186,9 +205,33 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
         }
     }
     
-    protected function getTestCaseUrl($name)
+    
+    /**
+     * Check an object parameter existance
+     *
+     * @Then /^(?:|The )"(?P<property>[^"]*)" property should exists$/
+     */
+    public function assertPropertyExists($property, $subject = null)
     {
-        //$container = $this->getContainer();
-        //echo $container->getParameter('test_cases');
+        $object = null;
+        switch (gettype($subject)) {
+            case 'object':
+                $object = $subject;
+                break;
+            case 'array':
+                $object = json_decode(json_encode($subject), false);
+                break;
+            case 'NULL':
+                $subject = $this->getSession()->getPage()->getText();
+            case 'string':
+                $object = json_decode($subject);
+                break;
+            default:
+                throw new \Exception('Object format not supported.');
+        }
+        if (!property_exists($object, $property)) {
+            throw new \Exception('Object property not found.');
+        }
+        return $object->$property;
     }
 }
