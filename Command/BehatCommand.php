@@ -21,7 +21,7 @@ class BehatCommand extends ContainerAwareCommand
      * Behat additional options
      * @var array $options
      */
-    public static $options = array('client','server','locale');
+    public static $options = array('client', 'server', 'locale');
     
     /**
      * {@inheritdoc}
@@ -35,6 +35,7 @@ class BehatCommand extends ContainerAwareCommand
             $this->addOption($option, null, InputOption::VALUE_OPTIONAL, 'Website '.$option.'.');
         }
         $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disable the JDR.');
+        $this->addOption('suite', null, InputOption::VALUE_OPTIONAL, 'Specify a test suite to execute.');
     }
 
     /**
@@ -56,15 +57,19 @@ class BehatCommand extends ContainerAwareCommand
         if ($input->hasParameterOption('--no-jdr')) {
             /* TODO */
         }
-        $this->runBehatCommand();
+        $args = array();
+        if ($input->hasParameterOption('--suite')) {
+            $args['--suite'] = $input->getParameterOption('--suite');
+        }
+        $this->runBehatCommand($args);
     }
     
     /**
      * Run behat original command
      * @param Container $container
      */
-    private function runBehatCommand() {
-        define('BEHAT_BIN_PATH',     $this->getContainer()->getParameter('kernel.root_dir').'/../bin/behat');
+    private function runBehatCommand(array $args = array()) {
+        define('BEHAT_BIN_PATH', $this->getContainer()->getParameter('kernel.root_dir').'/../bin/behat');
         function includeIfExists($file)
         {
             if (file_exists($file)) {
@@ -80,6 +85,6 @@ class BehatCommand extends ContainerAwareCommand
             exit(1);
         }
         $factory = new ApplicationFactory();
-        $factory->createApplication()->run(new ArrayInput(array()));
+        $factory->createApplication()->run(new ArrayInput($args));
     }
 }
