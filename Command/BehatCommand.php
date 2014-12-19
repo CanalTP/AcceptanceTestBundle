@@ -24,6 +24,12 @@ class BehatCommand extends ContainerAwareCommand
     public static $options = array('client', 'server', 'locale');
     
     /**
+     * Behat core args
+     * @var array $args
+     */
+    public static $args = array('suite', 'profile');
+    
+    /**
      * {@inheritdoc}
      */
     protected function configure()
@@ -58,8 +64,10 @@ class BehatCommand extends ContainerAwareCommand
             /* TODO */
         }
         $args = array();
-        if ($input->hasParameterOption('--suite')) {
-            $args['--suite'] = $input->getParameterOption('--suite');
+        foreach (self::$args as $arg) {
+            if ($input->hasParameterOption('--'.$arg)) {
+                $args['--'.$arg] = $input->getParameterOption('--'.$arg);
+            }
         }
         $this->runBehatCommand($args);
     }
