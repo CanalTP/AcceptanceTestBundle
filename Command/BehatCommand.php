@@ -41,7 +41,9 @@ class BehatCommand extends ContainerAwareCommand
             $this->addOption($option, null, InputOption::VALUE_OPTIONAL, 'Website '.$option.'.');
         }
         $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disable the JDR.');
-        $this->addOption('suite', null, InputOption::VALUE_OPTIONAL, 'Specify a test suite to execute.');
+        foreach (self::$args as $arg) {
+            $this->addOption($arg, null, InputOption::VALUE_OPTIONAL, 'Original argument "--'.$arg.'" of Behat.');
+        }
     }
 
     /**
