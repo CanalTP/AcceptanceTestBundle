@@ -5,6 +5,7 @@ namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
 use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Behat\Symfony2Extension\Context\KernelAwareContext;
 
 /**
  * Mink context for Behat BDD tool.
@@ -12,7 +13,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Vincent Catillon <vincent.catillon@canaltp.fr>
  */
-class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
+class MinkContext extends BaseMinkContext implements SnippetAcceptingContext, KernelAwareContext
 {
     /**
      * Behat additional options
@@ -50,13 +51,6 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
                 'locales' => $container->getParameter('behat.locales')
             );
         }
-    }
-    
-    /**
-     * Behat additional options initializer
-     */
-    public function __construct() {
-        $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
     }
     
     /**
@@ -233,5 +227,16 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
             throw new \Exception('Object property not found.');
         }
         return $object->$property;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function locatePath($path)
+    {
+        if ($this->getMinkParameter('base_url') === null) {
+            $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
+        }
+        return parent::locatePath($path);
     }
 }
