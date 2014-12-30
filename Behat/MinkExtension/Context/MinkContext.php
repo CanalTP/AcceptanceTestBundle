@@ -54,13 +54,6 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext, Ke
     }
     
     /**
-     * Behat additional options initializer
-     */
-    public function __construct() {
-        $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
-    }
-    
-    /**
      * Log with a role
      * 
      * @Given /^(?:|I am )logged as "(?P<role>(?:[^"]|\\")*)"$/
@@ -234,5 +227,16 @@ class MinkContext extends BaseMinkContext implements SnippetAcceptingContext, Ke
             throw new \Exception('Object property not found.');
         }
         return $object->$property;
+    }
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function locatePath($path)
+    {
+        if ($this->getMinkParameter('base_url') === null) {
+            $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
+        }
+        return parent::locatePath($path);
     }
 }
