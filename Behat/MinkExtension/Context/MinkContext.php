@@ -4,6 +4,7 @@ namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Behat\Symfony2Extension\Context\KernelAwareContext;
 
 /**
  * Mink context for Behat BDD tool.
