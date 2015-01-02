@@ -7,12 +7,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\DependencyInjection\Container;
 use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\MinkContext;
+use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\TraceContext;
 use Behat\Behat\ApplicationFactory;
 
 /**
- * Behat command with additional options (--client, --server, --locale, --no-jdr)
+ * Behat command with additional options (--client, --server, --locale, --no-jdr, --trace)
  * @author Vincent Catillon <vincent.catillon@canaltp.fr>
  */
 class BehatCommand extends ContainerAwareCommand
@@ -41,6 +41,7 @@ class BehatCommand extends ContainerAwareCommand
             $this->addOption($option, null, InputOption::VALUE_OPTIONAL, 'Website '.$option.'.');
         }
         $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disable the JDR.');
+        $this->addOption('trace', null, InputOption::VALUE_OPTIONAL, 'Trace output types.');
         foreach (self::$args as $arg) {
             $this->addOption($arg, null, InputOption::VALUE_OPTIONAL, 'Original argument "--'.$arg.'" of Behat.');
         }
@@ -65,6 +66,9 @@ class BehatCommand extends ContainerAwareCommand
         if ($input->hasParameterOption('--no-jdr')) {
             /* TODO */
         }
+        if ($input->hasParameterOption('--trace')) {
+            TraceContext::$outputTypes = explode('|', $input->getParameterOption('--trace'));
+        }
         $args = array();
         foreach (self::$args as $arg) {
             if ($input->hasParameterOption('--'.$arg)) {
@@ -76,7 +80,7 @@ class BehatCommand extends ContainerAwareCommand
     
     /**
      * Run behat original command
-     * @param Container $container
+     * @param array $args
      */
     private function runBehatCommand(array $args = array()) {
         define('BEHAT_BIN_PATH', $this->getContainer()->getParameter('kernel.root_dir').'/../bin/behat');
