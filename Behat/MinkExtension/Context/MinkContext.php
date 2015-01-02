@@ -2,7 +2,6 @@
 
 namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
 
-use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 
@@ -12,7 +11,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
  *
  * @author Vincent Catillon <vincent.catillon@canaltp.fr>
  */
-class MinkContext extends BaseMinkContext implements SnippetAcceptingContext
+class MinkContext extends TraceContext implements SnippetAcceptingContext, KernelAwareContext
 {
     /**
      * Behat additional options
