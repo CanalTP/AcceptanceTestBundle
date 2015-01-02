@@ -28,7 +28,7 @@ class TraceContext extends BaseMinkContext
      * 
      * @var array $outputTypes
      */
-    public static $outputTypes = array('html');
+    public static $outputTypes = array('html', 'png');
     /**
      * Scenario status
      * 
