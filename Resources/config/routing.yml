@@ -1,0 +1,3 @@
+acceptance_test_index:
+    pattern:  /
+    defaults: { _controller: CanalTPNmpAcceptanceTestBundle:Index:index }

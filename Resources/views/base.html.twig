@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>{% block title %}Home{% endblock %} - Acceptance tests</title>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" media="screen, projection" href="{{ asset('/bundles/canaltpnmpacceptancetest/css/styles.css') }}"
+    </head>
+    <body>
+        {% include 'CanalTPNmpAcceptanceTestBundle::nav.html.twig' %}
+        <div class="container">
+            {% block body %}{% endblock %}
+        </div>    
+    </body>
+</html>
