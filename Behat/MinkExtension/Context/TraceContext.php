@@ -19,56 +19,129 @@ class TraceContext extends BaseMinkContext
 {
     /**
      * Output path
-     * 
+     *
      * @var string $outputPath
      */
     public static $outputPath = 'behat';
     /**
      * Output types
-     * 
+     *
      * @var array $outputTypes
      */
     public static $outputTypes = array('html', 'png');
     /**
      * Scenario status
-     * 
+     *
      * @var boolean $scenarioStatus
      */
     private $scenarioStatus;
     /**
      * Scenario files
-     * 
+     *
      * @var array $files
      */
     private $files;
     /**
      * Step number
-     * 
+     *
      * @var integer $stepNumber
      */
     private $stepNumber;
     /**
      * Step name
-     * 
+     *
      * @var string $stepName
      */
     private $stepName;
     /**
      * Step visits
-     * 
+     *
      * @var array $stepVisits
      */
     private $stepVisits;
     /**
      * Step visits number
-     * 
+     *
      * @var integer $stepFilesNumber
      */
     private $stepVisitsNumber;
-    
+
+    /**
+     * @BeforeScenario
+     * @param BeforeScenarioScope $event
+     */
+    public function beforeScenario(BeforeScenarioScope $event)
+    {
+        $this->scenarioStatus = StepResult::PENDING;
+        $this->files = array();
+        $this->stepNumber = 0;
+    }
+
+    /**
+     * @BeforeStep
+     * @param BeforeStepScope $event
+     */
+    public function beforeStep(BeforeStepScope $event)
+    {
+        $this->stepVisits = array();
+        $this->stepVisitsNumber = 0;
+        $this->stepName = $this->getFormattedName($event->getStep()->getText());
+        $this->stepNumber++;
+    }
+
+    /**
+     * Save content of the page visited
+     *
+     * @param string $page
+     */
+    public function visit($page)
+    {
+        parent::visit($page);
+        $stepName = $this->stepNumber.'.'.++$this->stepVisitsNumber.'_'.$this->stepName;
+        $this->stepVisits = array_merge($this->stepVisits, $this->getPageContent($stepName));
+    }
+
+    /**
+     * @AfterStep
+     * @param AfterStepScope $event
+     */
+    public function afterStep(AfterStepScope $event)
+    {
+        if ($this->stepVisitsNumber > 1) {
+            $this->files = array_merge($this->files, $this->stepVisits);
+        } else {
+            $stepName = $this->stepNumber.'_'.$this->stepName;
+            $this->files = array_merge($this->files, $this->getPageContent($stepName));
+        }
+        if ($event->getTestResult()->getResultCode() == StepResult::FAILED) {
+            $this->scenarioStatus = StepResult::FAILED;
+        }
+    }
+
+    /**
+     * @AfterScenario
+     * @param AfterScenarioScope $event
+     */
+    public function afterScenario(AfterScenarioScope $event)
+    {
+        if ($this->scenarioStatus === StepResult::FAILED) {
+            $scenarioTitle = $event->getScenario()->getTitle();
+            $folders = array(
+                $event->getSuite()->getName(),
+                $event->getFeature()->getTitle().'.'.$scenarioTitle,
+            );
+            $path = $this->getPath($folders);
+            foreach ($this->files as $file => $content) {
+                file_put_contents($path.$file, $content);
+            }
+            $nbFiles = count($this->files);
+            print "Trace:\n"."- Directory: {$path}\n"."- Files: {$nbFiles}";
+        }
+    }
+
     /**
      * Get the path to write files
-     * 
+     *
      * @param array $folders
      * @return string
      */
@@ -78,18 +151,19 @@ class TraceContext extends BaseMinkContext
         $path = '';
         foreach ($folders as $folder) {
             if (strlen($folder)) {
-                $path .= $this->getFormattedName($folder) . DIRECTORY_SEPARATOR;
+                $path .= $this->getFormattedName($folder).DIRECTORY_SEPARATOR;
             }
         }
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
         }
+
         return $path;
     }
-    
+
     /**
      * Filename formatter
-     * 
+     *
      * @param string $name
      * @return string
      */
@@ -97,10 +171,10 @@ class TraceContext extends BaseMinkContext
     {
         return preg_replace("#[^a-z0-9_\-\.]#", '-', strtolower($name));
     }
-    
+
     /**
      * Page content (source, screenshot, etc)
-     * 
+     *
      * @param string $stepName
      * @return array
      */
@@ -123,76 +197,7 @@ class TraceContext extends BaseMinkContext
                 }
             }
         }
+
         return $stepFiles;
-    }
-    
-    /**
-     * @BeforeScenario
-     */
-    public function beforeScenario(BeforeScenarioScope $event)
-    {
-        $this->scenarioStatus = StepResult::PENDING;
-        $this->files = array();
-        $this->stepNumber = 0;
-    }
-    
-    /**
-     * @BeforeStep
-     */
-    public function beforeStep(BeforeStepScope $event)
-    {
-        $this->stepVisits = array();
-        $this->stepVisitsNumber = 0;
-        $this->stepName = $this->getFormattedName($event->getStep()->getText());
-        $this->stepNumber++;
-    }
-    
-    /**
-     * Save content of the page visited
-     * 
-     * @param string $page
-     */
-    public function visit($page) {
-        parent::visit($page);
-        $stepName = $this->stepNumber.'.'.++$this->stepVisitsNumber.'_'.$this->stepName;
-        $this->stepVisits = array_merge($this->stepVisits, $this->getPageContent($stepName));
-    }
-    
-    /**
-     * @AfterStep
-     */
-    public function afterStep(AfterStepScope $event)
-    {
-        if ($this->stepVisitsNumber > 1) {
-            $this->files = array_merge($this->files, $this->stepVisits);
-        } else {
-            $stepName = $this->stepNumber.'_'.$this->stepName;
-            $this->files = array_merge($this->files, $this->getPageContent($stepName));
-        }
-        if ($event->getTestResult()->getResultCode() == StepResult::FAILED) {
-            $this->scenarioStatus = StepResult::FAILED;
-        }
-    }
-     
-    /**
-     * @AfterScenario
-     */
-    public function afterScenario(AfterScenarioScope $event)
-    {
-        if ($this->scenarioStatus === StepResult::FAILED) {
-            $scenarioTitle = $event->getScenario()->getTitle();
-            $folders = array(
-                $event->getSuite()->getName(),
-                $event->getFeature()->getTitle().'.'.$scenarioTitle
-            );
-            $path = $this->getPath($folders);
-            foreach ($this->files as $file => $content) {
-                file_put_contents($path . $file, $content);
-            }
-            $nbFiles = count($this->files);
-            print "Trace:\n"
-                . "- Directory: {$path}\n"
-                . "- Files: {$nbFiles}";
-        }
     }
 }
