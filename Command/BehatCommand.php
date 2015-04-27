@@ -22,13 +22,13 @@ class BehatCommand extends ContainerAwareCommand
      * @var array $options
      */
     public static $options = array('client', 'server', 'locale');
-    
+
     /**
      * Behat core args
      * @var array $args
      */
     public static $args = array('suite', 'profile');
-    
+
     /**
      * {@inheritdoc}
      */
@@ -55,7 +55,7 @@ class BehatCommand extends ContainerAwareCommand
         MinkContext::$allowed = array(
             'clients' => $this->getContainer()->getParameter('behat.clients'),
             'servers' => $this->getContainer()->getParameter('behat.servers'),
-            'locales' => $this->getContainer()->getParameter('behat.locales')
+            'locales' => $this->getContainer()->getParameter('behat.locales'),
         );
         MinkContext::$options = $this->getContainer()->getParameter('behat.options');
         foreach (self::$options as $option) {
@@ -77,28 +77,35 @@ class BehatCommand extends ContainerAwareCommand
         }
         $this->runBehatCommand($args);
     }
-    
+
     /**
      * Run behat original command
      * @param array $args
      */
-    private function runBehatCommand(array $args = array()) {
+    private function runBehatCommand(array $args = array())
+    {
         define('BEHAT_BIN_PATH', $this->getContainer()->getParameter('kernel.root_dir').'/../bin/behat');
-        function includeIfExists($file)
-        {
-            if (file_exists($file)) {
-                return include $file;
-            }
-        }
-        if ((!$loader = includeIfExists($this->getContainer()->getParameter('kernel.root_dir').'/../vendor/autoload.php')) && (!$loader = includeIfExists($container->getParameter('kernel.root_dir').'/../../../../autoload.php'))) {
-            fwrite(STDERR,
-                'You must set up the project dependencies, run the following commands:'.PHP_EOL.
-                'curl -s http://getcomposer.org/installer | php'.PHP_EOL.
-                'php composer.phar install'.PHP_EOL
+        if ((!$loader = $this->includeIfExists($this->getContainer()->getParameter('kernel.root_dir').'/../vendor/autoload.php')) && (!$loader = $this->includeIfExists($container->getParameter('kernel.root_dir').'/../../../../autoload.php'))) {
+            fwrite(
+                STDERR,
+                'You must set up the project dependencies, run the following commands:'.PHP_EOL.'curl -s http://getcomposer.org/installer | php'.PHP_EOL.'php composer.phar install'.PHP_EOL
             );
             exit(1);
         }
         $factory = new ApplicationFactory();
         $factory->createApplication()->run(new ArrayInput($args));
+    }
+
+    /**
+     * File includer
+     *
+     * @param string $file
+     * @return type
+     */
+    private function includeIfExists($file)
+    {
+        if (file_exists($file)) {
+            return include $file;
+        }
     }
 }

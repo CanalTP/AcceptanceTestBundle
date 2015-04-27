@@ -17,19 +17,19 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
 {
     /**
      * Behat additional options
-     * 
+     *
      * @var array $options
      */
     public static $options;
     /**
      * Allowed values for addtional options
-     * 
+     *
      * @var array $allowed
      */
     public static $allowed;
     /**
      * Application Kernel
-     * 
+     *
      * @var KernelInterface $kernel
      */
     private $kernel;
@@ -48,21 +48,22 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             self::$allowed = array(
                 'clients' => $container->getParameter('behat.clients'),
                 'servers' => $container->getParameter('behat.servers'),
-                'locales' => $container->getParameter('behat.locales')
+                'locales' => $container->getParameter('behat.locales'),
             );
         }
     }
-    
+
     /**
      * Behat additional options initializer
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
     }
-    
+
     /**
      * Log with a role
-     * 
+     *
      * @Given /^(?:|I am )logged as "(?P<role>(?:[^"]|\\")*)"$/
      */
     public function logAs($role)
@@ -80,17 +81,17 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 break;
         }
     }
-    
+
     /**
      * Using a specific server, client and locale
-     * 
+     *
      * @Given /^(?:|(?:|I am )on "(?P<server>(?:[^"]|\\")*)" )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in "(?P<locale>(?:[^"]|\\")*)")$/
      */
     public function forTheClient($client, $server = null, $locale = null)
     {
         if (!in_array($client, self::$allowed['clients'])) {
             throw new \Exception('Website client "'.$client.'" not found.');
-        }        
+        }
         if (!in_array($server, self::$allowed['servers']) && !empty($server)) {
             throw new \Exception('Website server "'.$server.'" not found.');
         } else {
@@ -107,10 +108,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
         $this->setMinkParameter('base_url', strtr($baseUrl, array(' ', '')));
     }
-    
+
     /**
      * Enable or disable JS
-     * 
+     *
      * @Given /^With(?P<suffix>(?:|out)) Javascript$/
      */
     public function withJavascript($suffix)
@@ -119,17 +120,17 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             // Use Goutte (default: Selenium)
         }
     }
-    
+
     /**
      * Click on element with specified CSS
-     * 
+     *
      * @When /^(?:|I )click on "(?P<id>(?:[^"]|\\")*)"$/
      */
     public function clickOn($element)
     {
         $this->assertSession()->elementExists('css', $element)->click();
     }
-    
+
     /**
      * Checks, that element with specified CSS is visible on page.
      *
@@ -141,7 +142,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             throw new \Exception('Element "'.$element.'" not visible.');
         }
     }
-    
+
     /**
      * Checks, that element with specified CSS is not visible on page.
      *
@@ -153,23 +154,23 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             throw new \Exception('Element "'.$element.'" visible.');
         }
     }
-    
+
     /**
      * Checks, that element children with specified CSS are on page.
-     * 
+     *
      * @param string $element
      * @param array $children
      */
     public function assertElementChildrenOnPage($element, $children = array())
     {
         foreach ($children as $child) {
-            $this->assertElementOnPage($element . ' ' . $child);
+            $this->assertElementOnPage($element.' '.$child);
         }
     }
-    
+
     /**
      * Checks, that element children with specified CSS are not on page.
-     * 
+     *
      * @param string $element
      * @param array $children
      */
@@ -179,10 +180,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             $this->assertElementNotOnPage($element . ' ' . $child);
         }
     }
-    
+
     /**
      * Checks, that element childrens with specified CSS are visible on page.
-     * 
+     *
      * @param string $element
      * @param array $childrens
      */
@@ -192,10 +193,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             $this->assertElementVisible($element.' '.$children);
         }
     }
-    
+
     /**
      * Checks, that element childrens with specified CSS are not visible on page.
-     * 
+     *
      * @param string $element
      * @param array $childrens
      */
@@ -205,8 +206,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             $this->assertElementNotVisible($element.' '.$children);
         }
     }
-    
-    
+
     /**
      * Check an object parameter existance
      *
@@ -224,6 +224,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 break;
             case 'NULL':
                 $subject = $this->getSession()->getPage()->getText();
+                // Default subject value used in the next case without break;
             case 'string':
                 $object = json_decode($subject);
                 break;
@@ -233,6 +234,17 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         if (!property_exists($object, $property)) {
             throw new \Exception('Object property not found.');
         }
+
         return $object->$property;
+    }
+
+    /**
+     * Redirection to an url
+     *
+     * @Then /^(?:|I am )redirected to "(?P<page>[^"]*)"$/
+     */
+    public function redirectedTo($page)
+    {
+        $this->assertPageAddress($page);
     }
 }
