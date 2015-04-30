@@ -1,0 +1,23 @@
+{% extends 'CanalTPNmpAcceptanceTestBundle::base.html.twig' %}
+
+{% block body %}
+    <h1>Acceptance tests list</h1>
+    <div class="row">
+        <div class="col-md-3">
+            <ul class="nav nav-pills nav-stacked">
+                {% for bundle in bundles %}
+                    <li><a href="#">{{ bundle.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="col-md-9">
+            {% for bundle in bundles %}
+                <h2>{{ bundle.title }}</h2>
+                {% for feature in bundle.features %}
+                    <h3 class="filename">File: {{ feature.title }}</h3>
+                    <pre class="feature">{{ feature.scenarios|raw }}</pre>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
