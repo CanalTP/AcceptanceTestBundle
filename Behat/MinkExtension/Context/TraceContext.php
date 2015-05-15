@@ -30,6 +30,12 @@ class TraceContext extends BaseMinkContext
      */
     public static $outputTypes = array('html', 'png');
     /**
+     * Max length file name
+     *
+     * @var integer $maxLengthFileName
+     */
+    public static $maxLengthFileName = 20;
+    /**
      * Scenario status
      *
      * @var boolean $scenarioStatus
@@ -85,7 +91,7 @@ class TraceContext extends BaseMinkContext
     {
         $this->stepVisits = array();
         $this->stepVisitsNumber = 0;
-        $this->stepName = $this->getFormattedName($event->getStep()->getText());
+        $this->stepName = $this->getFormattedName($event->getStep()->getText(), self::$maxLengthFileName);
         $this->stepNumber++;
     }
 
@@ -165,11 +171,14 @@ class TraceContext extends BaseMinkContext
      * Filename formatter
      *
      * @param string $name
+     * @param integer $length
      * @return string
      */
-    private function getFormattedName($name)
+    private function getFormattedName($name, $length = null)
     {
-        return preg_replace("#[^a-z0-9_\-\.]#", '-', strtolower($name));
+        $formattedName = preg_replace("#[^a-z0-9_\-\.]#", '-', strtolower($name));
+
+        return $length !== null ? substr($formattedName, 0, $length) : $formattedName;
     }
 
     /**

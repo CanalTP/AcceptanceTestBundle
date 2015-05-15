@@ -6,6 +6,7 @@ use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 
 /**
  * Mink context for Behat BDD tool.
@@ -33,6 +34,16 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      * @var KernelInterface $kernel
      */
     private $kernel;
+
+    /**
+     * @BeforeScenario
+     * @param BeforeScenarioScope $event
+     */
+    public function beforeScenario(BeforeScenarioScope $event)
+    {
+        $this->getSession()->reset();
+        parent::beforeScenario($event);
+    }
 
     /**
      * {@inheritdoc}
@@ -246,5 +257,15 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function redirectedTo($page)
     {
         $this->assertPageAddress($page);
+    }
+
+    /**
+     * Cookie creator
+     *
+     * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" with value "(?P<value>[^"]*)"$/
+     */
+    public function cookieWithValue($name, $value)
+    {
+        $this->getSession()->setCookie($name, $value);
     }
 }
