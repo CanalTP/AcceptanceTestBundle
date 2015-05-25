@@ -7,6 +7,8 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Symfony\Component\Yaml\Parser;
+use Behat\Behat\Tester\Exception\PendingException;
 
 /**
  * Mink context for Behat BDD tool.
@@ -28,6 +30,12 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      * @var array $allowed
      */
     public static $allowed;
+    /**
+     * Use cases
+     *
+     * @var array $useCases
+     */
+    protected $useCases;
     /**
      * Application Kernel
      *
@@ -267,5 +275,30 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function cookieWithValue($name, $value)
     {
         $this->getSession()->setCookie($name, $value);
+    }
+
+    private function getUseCasesFile()
+    {
+        // TODO
+        return '';
+    }
+
+    /**
+     * Use cases getter by module
+     */
+    protected function getUseCases($module)
+    {
+        if (is_null($this->useCases)) {
+            $file = $this->getUseCasesFile();
+            if (!file_exists($file) || !is_file($file)) {
+                throw new PendingException(sprintf('Use cases missing: %s', $file));
+            }
+            $parser = new Parser();
+            $yaml = $parser->parse(file_get_contents($file));
+            $this->useCases = !empty($yaml['canal_tp_nmp_acceptance_test']['use_cases']) ?
+                $yaml['canal_tp_nmp_acceptance_test']['use_cases'] : array();
+        }
+
+        return isset($this->useCases[$module]) ? $this->useCases[$module] : array();
     }
 }
