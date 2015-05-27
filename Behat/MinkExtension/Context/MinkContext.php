@@ -2,13 +2,13 @@
 
 namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
 
-use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Symfony\Component\Yaml\Parser;
 use Behat\Behat\Tester\Exception\PendingException;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Mink context for Behat BDD tool.
@@ -36,6 +36,12 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      * @var array $useCases
      */
     protected $useCases;
+    /**
+     * Timeouts
+     *
+     * @var array $timeouts
+     */
+    protected $timeouts;
     /**
      * Application Kernel
      *
@@ -70,6 +76,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 'locales' => $container->getParameter('behat.locales'),
             );
         }
+        $this->timeouts = $container->getParameter('behat.timeouts');
     }
 
     /**
@@ -196,7 +203,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function assertElementChildrenNotOnPage($element, $children = array())
     {
         foreach ($children as $child) {
-            $this->assertElementNotOnPage($element . ' ' . $child);
+            $this->assertElementNotOnPage($element.' '.$child);
         }
     }
 
@@ -277,10 +284,39 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $this->getSession()->setCookie($name, $value);
     }
 
+    /**
+     * Use cases iterator by module
+     *
+     * @Then /^For each "(?P<module>[^"]*)" use case$/
+     */
+    public function forEachUseCase($module)
+    {
+        foreach ($this->getUseCases($module) as $index => $useCase) {
+            if (!$index) {
+                $useCases[] = array_keys($useCase);
+            }
+            $useCases[] = array_values($useCase);
+        }
+
+        return new TableNode($useCases);
+    }
+
+    /**
+     * Use cases file getter
+     *
+     * @return string
+     */
     private function getUseCasesFile()
     {
-        // TODO
-        return '';
+        switch (self::$options['client']) {
+            case 'Ctp':
+                $dir = $this->kernel->getRootdir().'/config';
+                break;
+            default:
+                $dir = $this->kernel->getRootdir().'/../custom/'.self::$options['client'].'/Resources/config';
+        }
+
+        return $dir.'/test_cases.yml';
     }
 
     /**
@@ -300,5 +336,60 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
 
         return isset($this->useCases[$module]) ? $this->useCases[$module] : array();
+    }
+
+    /**
+     * Wait until function
+     *
+     * @param integer $timeout
+     * @param Function $callback
+     * @return boolean
+     * @throws Exception
+     */
+    protected function waitFor($timeout, $callback, $parameters = array())
+    {
+        for ($i = 0; $i < $timeout; $i++) {
+            try {
+                if ($callback($this, $parameters)) {
+                    return true;
+                }
+            } catch (Exception $e) {
+            }
+
+            sleep(1);
+        }
+
+        $backtrace = debug_backtrace();
+
+        throw new \Exception(
+            sprintf(
+                'Timeout thrown by "%s::%s()" in %s, line %s',
+                $backtrace[1]['class'],
+                $backtrace[1]['function'],
+                $backtrace[1]['file'],
+                $backtrace[1]['line']
+            )
+        );
+    }
+
+    /**
+     * Autocomplete field fill function
+     * @param string $field
+     * @param string $value
+     * /^I fill the autocomplete field "" with value ""$/
+     */
+    protected function fillAutocompleteField($field, $value)
+    {
+        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").val("'.$value.'");');
+        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").autocomplete("search");');
+        $targetList = $this->assertSession()->elementExists('css', '#'.$field)->getAttribute('data-target-list');
+        $this->waitFor(
+            $this->timeouts['autocomplete'] / 1000,
+            function ($context, $parameters) {
+                return $context->assertSession()->elementExists('css', '#'.$parameters['targetList'])->isVisible();
+            },
+            array('targetList' => $targetList)
+        );
+        $this->clickOn('#'.$targetList.' .ui-autocomplete-item-0 a');
     }
 }

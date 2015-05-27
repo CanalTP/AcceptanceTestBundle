@@ -30,5 +30,6 @@ class CanalTPNmpAcceptanceTestExtension extends Extension
         $container->setParameter('behat.servers', $config['servers']);
         $container->setParameter('behat.locales', $config['locales']);
         $container->setParameter('behat.options', $config['options']);
+        $container->setParameter('behat.timeouts', $config['timeouts']);
     }
 }
