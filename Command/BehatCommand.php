@@ -9,22 +9,25 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
 use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\MinkContext;
 use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\TraceContext;
-use Behat\Behat\ApplicationFactory;
+use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\ApplicationFactory;
 
 /**
  * Behat command with additional options (--client, --server, --locale, --no-jdr, --trace)
+ *
  * @author Vincent Catillon <vincent.catillon@canaltp.fr>
  */
 class BehatCommand extends ContainerAwareCommand
 {
     /**
      * Behat additional options
+     *
      * @var array $options
      */
     public static $options = array('client', 'server', 'locale');
 
     /**
      * Behat core args
+     *
      * @var array $args
      */
     public static $args = array('suite', 'profile');
@@ -80,19 +83,24 @@ class BehatCommand extends ContainerAwareCommand
 
     /**
      * Run behat original command
+     *
      * @param array $args
      */
     private function runBehatCommand(array $args = array())
     {
-        define('BEHAT_BIN_PATH', $this->getContainer()->getParameter('kernel.root_dir').'/../bin/behat');
-        if ((!$loader = $this->includeIfExists($this->getContainer()->getParameter('kernel.root_dir').'/../vendor/autoload.php')) && (!$loader = $this->includeIfExists($container->getParameter('kernel.root_dir').'/../../../../autoload.php'))) {
+        $container = $this->getContainer();
+        $rootDir = $container->getParameter('kernel.root_dir');
+        define('BEHAT_BIN_PATH', $rootDir.'/../bin/behat');
+        if ((!$loader = $this->includeIfExists($rootDir.'/../vendor/autoload.php')) && (!$loader = $this->includeIfExists($rootDir.'/../../../../autoload.php'))) {
             fwrite(
                 STDERR,
                 'You must set up the project dependencies, run the following commands:'.PHP_EOL.'curl -s http://getcomposer.org/installer | php'.PHP_EOL.'php composer.phar install'.PHP_EOL
             );
             exit(1);
         }
-        $factory = new ApplicationFactory();
+        $testCasesLoader = $container->get('canaltp.test_cases_loader');
+        $testCases = $testCasesLoader->getTestCases(MinkContext::$options['client']);
+        $factory = new ApplicationFactory($testCases);
         $factory->createApplication()->run(new ArrayInput($args));
     }
 

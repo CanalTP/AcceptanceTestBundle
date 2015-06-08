@@ -6,9 +6,6 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Symfony\Component\Yaml\Parser;
-use Behat\Behat\Tester\Exception\PendingException;
-use Behat\Gherkin\Node\TableNode;
 
 /**
  * Mink context for Behat BDD tool.
@@ -30,12 +27,6 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      * @var array $allowed
      */
     public static $allowed;
-    /**
-     * Use cases
-     *
-     * @var array $useCases
-     */
-    protected $useCases;
     /**
      * Timeouts
      *
@@ -285,57 +276,23 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
-     * Use cases iterator by module
+     * Autocomplete field filler
      *
-     * @Then /^For each "(?P<module>[^"]*)" use case$/
+     * @When /^I fill the autocomplete field "(?P<field>[^"]*)" with "(?P<value>[^"]*)"$/
      */
-    public function forEachUseCase($module)
+    public function iFillTheAutocompleteFieldWith($field, $value)
     {
-        foreach ($this->getUseCases($module) as $index => $useCase) {
-            if (!$index) {
-                $useCases[] = array_keys($useCase);
-            }
-            $useCases[] = array_values($useCase);
-        }
-
-        return new TableNode($useCases);
-    }
-
-    /**
-     * Use cases file getter
-     *
-     * @return string
-     */
-    private function getUseCasesFile()
-    {
-        switch (self::$options['client']) {
-            case 'Ctp':
-                $dir = $this->kernel->getRootdir().'/config';
-                break;
-            default:
-                $dir = $this->kernel->getRootdir().'/../custom/'.self::$options['client'].'/Resources/config';
-        }
-
-        return $dir.'/test_cases.yml';
-    }
-
-    /**
-     * Use cases getter by module
-     */
-    protected function getUseCases($module)
-    {
-        if (is_null($this->useCases)) {
-            $file = $this->getUseCasesFile();
-            if (!file_exists($file) || !is_file($file)) {
-                throw new PendingException(sprintf('Use cases missing: %s', $file));
-            }
-            $parser = new Parser();
-            $yaml = $parser->parse(file_get_contents($file));
-            $this->useCases = !empty($yaml['canal_tp_nmp_acceptance_test']['use_cases']) ?
-                $yaml['canal_tp_nmp_acceptance_test']['use_cases'] : array();
-        }
-
-        return isset($this->useCases[$module]) ? $this->useCases[$module] : array();
+        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").val("'.$value.'");');
+        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").autocomplete("search");');
+        $targetList = $this->assertSession()->elementExists('css', '#'.$field)->getAttribute('data-target-list');
+        $this->waitFor(
+            $this->timeouts['autocomplete'] / 1000,
+            function ($context, $parameters) {
+                return $context->assertSession()->elementExists('css', '#'.$parameters['targetList'])->isVisible();
+            },
+            array('targetList' => $targetList)
+        );
+        $this->clickOn('#'.$targetList.' .ui-autocomplete-item-0 a');
     }
 
     /**
@@ -370,26 +327,5 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 $backtrace[1]['line']
             )
         );
-    }
-
-    /**
-     * Autocomplete field fill function
-     * @param string $field
-     * @param string $value
-     * /^I fill the autocomplete field "" with value ""$/
-     */
-    protected function fillAutocompleteField($field, $value)
-    {
-        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").val("'.$value.'");');
-        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").autocomplete("search");');
-        $targetList = $this->assertSession()->elementExists('css', '#'.$field)->getAttribute('data-target-list');
-        $this->waitFor(
-            $this->timeouts['autocomplete'] / 1000,
-            function ($context, $parameters) {
-                return $context->assertSession()->elementExists('css', '#'.$parameters['targetList'])->isVisible();
-            },
-            array('targetList' => $targetList)
-        );
-        $this->clickOn('#'.$targetList.' .ui-autocomplete-item-0 a');
     }
 }

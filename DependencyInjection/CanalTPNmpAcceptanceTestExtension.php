@@ -21,10 +21,11 @@ class CanalTPNmpAcceptanceTestExtension extends Extension
     {
         $configuration = new Configuration();
         $config = $this->processConfiguration($configuration, $configs);
-        $loader = new Loader\YamlFileLoader(
+        $loader = new Loader\XMLFileLoader(
             $container,
             new FileLocator(__DIR__.'/../Resources/config')
         );
+        $loader->load('services.xml');
 
         $container->setParameter('behat.clients', $config['clients']);
         $container->setParameter('behat.servers', $config['servers']);
