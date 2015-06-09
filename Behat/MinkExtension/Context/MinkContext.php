@@ -6,6 +6,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Tester\Exception\PendingException;
 
 /**
  * Mink context for Behat BDD tool.
@@ -47,6 +48,9 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function beforeScenario(BeforeScenarioScope $event)
     {
         $this->getSession()->reset();
+        if (empty($this->getMinkParameter('base_url'))) {
+            $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
+        }
         parent::beforeScenario($event);
     }
 
@@ -68,14 +72,6 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             );
         }
         $this->timeouts = $container->getParameter('behat.timeouts');
-    }
-
-    /**
-     * Behat additional options initializer
-     */
-    public function __construct()
-    {
-        $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
     }
 
     /**
@@ -123,6 +119,15 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         if (trim($locale) !== '') {
             $baseUrl .= '/'.$locale;
         }
+        if (!empty($this->getMinkParameter('base_url')) && $this->getMinkParameter('base_url') !== $baseUrl) {
+            throw new PendingException(
+                sprintf(
+                    'Scenario base URL (%s) different than the current base URL (%s): skipped.',
+                    $baseUrl,
+                    $this->getMinkParameter('base_url')
+                )
+            );
+        }
         $this->setMinkParameter('base_url', strtr($baseUrl, array(' ', '')));
     }
 
@@ -169,6 +174,18 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     {
         if ($this->assertSession()->elementExists('css', $element)->isVisible()) {
             throw new \Exception('Element "'.$element.'" visible.');
+        }
+    }
+
+    /**
+     * Checks, that element with specified CSS is not empty.
+     *
+     * @Then /^(?:|The )"(?P<element>[^"]*)" element (should not be|is not) empty$/
+     */
+    public function assertElementNotEmpty($element)
+    {
+        if (empty($this->assertSession()->elementExists('css', $element)->getHtml())) {
+            throw new \Exception('Element "'.$element.'" empty.');
         }
     }
 
@@ -278,21 +295,76 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     /**
      * Autocomplete field filler
      *
-     * @When /^I fill the autocomplete field "(?P<field>[^"]*)" with "(?P<value>[^"]*)"$/
+     * @When /^I fill in "(?P<field>[^"]*)" with autocomplete "(?P<value>[^"]*)"(?:| in "(?P<form>[^"]*)" form)$/
      */
-    public function iFillTheAutocompleteFieldWith($field, $value)
+    public function iFillWithAutocomplete($field, $value, $form = null)
     {
-        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").val("'.$value.'");');
-        $this->getSession()->executeScript('CanalTP.jQuery("#'.$field.'").autocomplete("search");');
-        $targetList = $this->assertSession()->elementExists('css', '#'.$field)->getAttribute('data-target-list');
+        $fieldId = ($form !== null ? '#ctp-'.$form.'Form ' : '').'#'.$field;
+        $this->getSession()->executeScript('CanalTP.jQuery("'.$fieldId.'").val("'.$value.'");');
+        $this->getSession()->executeScript('CanalTP.jQuery("'.$fieldId.'").autocomplete("search");');
+        $target = $this->assertSession()->elementExists('css', $fieldId)->getAttribute('data-target-list');
         $this->waitFor(
             $this->timeouts['autocomplete'] / 1000,
             function ($context, $parameters) {
-                return $context->assertSession()->elementExists('css', '#'.$parameters['targetList'])->isVisible();
+                return $context->assertSession()->elementExists('css', '#'.$parameters['target'])->isVisible();
             },
-            array('targetList' => $targetList)
+            array('target' => $target)
         );
-        $this->clickOn('#'.$targetList.' .ui-autocomplete-item-0 a');
+        $this->clickOn('#'.$target.' .ui-autocomplete-item-0 a');
+    }
+
+    /**
+     * Linked fields by AJAX filler
+     *
+     * @When /^I fill in "(?P<field>[^"]*)" with option "(?P<value>[^"]*)"(?:| waiting for "(?P<target>[^"]*)")$/
+     */
+    public function iFillWithOption($field, $value, $target = null)
+    {
+        $this->getSession()->executeScript(
+            'CanalTP.jQuery("#'.$field.' option").each(function() {
+                if (CanalTP.jQuery.trim(this.value) === "'.trim($value).'" || CanalTP.jQuery.trim(this.text) === "'.trim($value).'") {
+                    CanalTP.jQuery("#'.$field.'").val(this.value).change();
+                }
+            });'
+        );
+        if ($target !== null) {
+            $this->waitFor(
+                $this->timeouts['ajax'] / 1000,
+                function ($context, $parameters) {
+                    try {
+                        $target = $context->assertSession()->elementExists('css', '#'.$parameters['target']);
+
+                        return $target->isVisible();
+                    } catch (\Exception $e) {
+                    }
+                },
+                array('target' => $target)
+            );
+        }
+    }
+
+    /**
+     * Form submit function
+     *
+     * @When /^I submit the "(?P<form>[^"]*)" form$/
+     */
+    public function iSubmitTheForm($form)
+    {
+        $this->clickOn('#ctp-'.$form.'Form [type="submit"]');
+    }
+
+    /**
+     * Accordion toggle function
+     *
+     * @When /^I click on "(?P<block>[^"]*)" accordion$/
+     */
+    public function iClickOnAccordion($block)
+    {
+        $accordionToggle = $this->assertSession()->elementExists('css', $block.' .accordion-toggle');
+        $accordionTarget = $accordionToggle->getAttribute('data-target');
+        if (!$this->assertSession()->elementExists('css', $accordionTarget)->isVisible()) {
+            $accordionToggle->click();
+        }
     }
 
     /**
@@ -316,16 +388,6 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             sleep(1);
         }
 
-        $backtrace = debug_backtrace();
-
-        throw new \Exception(
-            sprintf(
-                'Timeout thrown by "%s::%s()" in %s, line %s',
-                $backtrace[1]['class'],
-                $backtrace[1]['function'],
-                $backtrace[1]['file'],
-                $backtrace[1]['line']
-            )
-        );
+        throw new \Exception('Timeout thrown during the step');
     }
 }

@@ -4,32 +4,23 @@ canal_tp_nmp_acceptance_test:
             0:
                 from: Brest
                 to: Rennes
-            1:
-                from: Rennes
-                to: Brest
-        stop_schedule:
+                expected: ~
+        schedule:
             0:
                 stop_area: Brest
-            1:
-                stop_area: Rennes
+                expected: ~
         multimodal:
             0:
                 from: Brest
                 to: Rennes
-            1:
-                from: Rennes
-                to: Brest
+                expected: ~
         line_schedule:
             0:
                 network: Auray Bus - Auray
-                line: Bus Ligne Jaune
+                line: Ligne Jaune
                 route: Ligne Jaune Brech-Centre Ville-Pluneret-P Océane
-            1:
-                network: Auray Bus - Auray
-                line: Bus Ligne Jaune
-                route: Ligne Jaune P. Océane-Centre Ville-Pluneret-Brech
+                expected: ~
         proximity:
             0:
                 uri: Brest
-            1:
-                from: Rennes
+                expected: ~

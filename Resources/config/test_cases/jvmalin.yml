@@ -4,32 +4,19 @@ canal_tp_nmp_acceptance_test:
             0:
                 from: Orléans
                 to: Gien
-            1:
-                from: Gien
-                to: Orléans
-        stop_schedule:
+                expected: ~
+        schedule:
             0:
                 stop_area: Orléans
-            1:
-                stop_area: Gien
-        multimodal:
-            0:
-                from: Orléans
-                to: Gien
-            1:
-                from: Gien
-                to: Orléans
+                expected: ~
+        multimodal: ~
         line_schedule:
             0:
                 network: Agglobus - Bourges
-                line: Bus 1 FOULONNE - ROTTEE
+                line: 1 FOULONNE - ROTTEEdoekzokde
                 route: Foulonne - La Rottée
-            1:
-                network: Agglobus - Bourges
-                line: Bus 1 FOULONNE - ROTTEE
-                route: La Rottée - La Foulonne
+                expected: ~
         proximity:
             0:
                 uri: Orléans
-            1:
-                from: Gien
+                expected: ~

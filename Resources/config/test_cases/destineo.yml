@@ -5,37 +5,22 @@ canal_tp_nmp_acceptance_test:
                 from: Nantes
                 to: Cholet
                 expected: ~
-            1:
-                from: Cholet
-                to: Nantes
-                expected: tad
-            2:
-                from: Nantes
-                to: Cholet
-                expected: ~
-        stop_schedule:
+        schedule:
             0:
                 stop_area: Nantes
-            1:
-                stop_area: Cholet
+                expected: ~
         multimodal:
             0:
                 from: Nantes
                 to: Cholet
-            1:
-                from: Cholet
-                to: Nantes
+                expected: ~
         line_schedule:
             0:
                 network: Irigo
-                line: 05 Circulaire
+                line: 05 Circulairezdedzed
                 route: Circulaire sens A
-            1:
-                network: Irigo
-                line: 05 Circulaire
-                route: Circulaire sens B
+                expected: ~
         proximity:
             0:
                 uri: Nantes
-            1:
-                from: Cholet
+                expected: ~
