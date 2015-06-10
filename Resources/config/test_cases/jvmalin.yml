@@ -13,7 +13,7 @@ canal_tp_nmp_acceptance_test:
         line_schedule:
             0:
                 network: Agglobus - Bourges
-                line: 1 FOULONNE - ROTTEEdoekzokde
+                line: 1 FOULONNE - ROTTEE
                 route: Foulonne - La Rottée
                 expected: ~
         proximity:

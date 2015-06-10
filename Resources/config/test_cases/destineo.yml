@@ -17,7 +17,7 @@ canal_tp_nmp_acceptance_test:
         line_schedule:
             0:
                 network: Irigo
-                line: 05 Circulairezdedzed
+                line: 05 Circulaire
                 route: Circulaire sens A
                 expected: ~
         proximity:
