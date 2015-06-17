@@ -52,7 +52,8 @@ class Parser extends BaseParser
     protected function parseExamples()
     {
         $node = parent::parseExamples();
-        if (empty($node->getTable())) {
+        $table = $node->getTable();
+        if (empty($table)) {
             $module = trim($this->parseText());
             $node = new ExampleTableNode($this->loadExamplesFromTestCases($module), $node->getKeyword());
         }
