@@ -119,7 +119,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         if (trim($locale) !== '') {
             $baseUrl .= '/'.$locale;
         }
-        if (!empty($this->getMinkParameter('base_url')) && $this->getMinkParameter('base_url') !== $baseUrl) {
+        if ($this->getMinkParameter('base_url') !== null && $this->getMinkParameter('base_url') !== $baseUrl) {
             throw new PendingException(
                 sprintf(
                     'Scenario base URL (%s) different than the current base URL (%s): skipped.',
@@ -184,7 +184,8 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function assertElementNotEmpty($element)
     {
-        if (empty($this->assertSession()->elementExists('css', $element)->getHtml())) {
+        $html = $this->assertSession()->elementExists('css', $element)->getHtml();
+        if (empty($html)) {
             throw new \Exception('Element "'.$element.'" empty.');
         }
     }
