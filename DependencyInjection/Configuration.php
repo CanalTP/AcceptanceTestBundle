@@ -50,8 +50,18 @@ class Configuration implements ConfigurationInterface
                         ->end()
                     ->end()
                 ->end()
+                ->arrayNode('timeouts')
+                    ->defaultValue(array())
+                    ->prototype('scalar')
+                    ->end()
+                    ->children()
+                        ->integerNode('autocomplete')
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ->end();
+
         return $treeBuilder;
     }
 }

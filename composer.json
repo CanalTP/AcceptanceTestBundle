@@ -1,0 +1,23 @@
+{
+    "name": "canaltp/nmp-acceptance-test",
+    "type": "library",
+    "description": "NMP Acceptance test",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Catillon Vincent",
+            "email": "vincent.catillon@canaltp.fr"
+        }
+    ],
+    "require": {
+        "behat/behat": "~3.0"
+    },
+    "autoload": {
+        "psr-4": { "CanalTP\\NmpAcceptanceTestBundle\\": "" }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0-dev"
+        }
+    }
+}
