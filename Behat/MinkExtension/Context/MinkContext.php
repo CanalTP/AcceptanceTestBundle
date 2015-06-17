@@ -48,7 +48,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function beforeScenario(BeforeScenarioScope $event)
     {
         $this->getSession()->reset();
-        if (empty($this->getMinkParameter('base_url'))) {
+        if ($this->getMinkParameter('base_url') !== null) {
             $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
         }
         parent::beforeScenario($event);
