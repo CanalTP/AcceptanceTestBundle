@@ -50,6 +50,8 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $this->getSession()->reset();
         if ($this->getMinkParameter('base_url') === null) {
             $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
+        } else {
+            $this->inLocale(self::$options['locale']);
         }
         parent::beforeScenario($event);
     }
@@ -98,37 +100,75 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     /**
      * Using a specific server, client and locale
      *
-     * @Given /^(?:|(?:|I am )on "(?P<server>(?:[^"]|\\")*)" )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in "(?P<locale>(?:[^"]|\\")*)")$/
+     * @Given /^(?:|(?:|I am )on "(?P<server>(?:[^"]|\\")*)" server )for the client "(?P<client>(?:[^"]|\\")*)"(?:| in locale "(?P<locale>(?:[^"]|\\")*)")$/
      */
     public function forTheClient($client, $server = null, $locale = null)
     {
         if (!in_array($client, self::$allowed['clients'])) {
             throw new \Exception('Website client "'.$client.'" not found.');
         }
-        if (!in_array($server, self::$allowed['servers']) && !empty($server)) {
-            throw new \Exception('Website server "'.$server.'" not found.');
-        } else {
-            $server = self::$options['server'];
-        }
-        if ($locale !== '' && !in_array($locale, self::$allowed['locales']) && !empty($locale)) {
-            throw new \Exception('Website locale "'.$locale.'" not found.');
-        } elseif ($locale !== '') {
-            $locale = self::$options['locale'];
-        }
-        $baseUrl = 'http://nmp-ihm.'.strtolower($client).'.'.strtolower($server).'.canaltp.fr';
-        if (trim($locale) !== '') {
-            $baseUrl .= '/'.$locale;
-        }
-        if ($this->getMinkParameter('base_url') !== null && $this->getMinkParameter('base_url') !== $baseUrl) {
+        if (!empty($client) && $client !== self::$options['client']) {
             throw new PendingException(
                 sprintf(
-                    'Scenario base URL (%s) different than the current base URL (%s): skipped.',
-                    $baseUrl,
-                    $this->getMinkParameter('base_url')
+                    'SKIPPED: client (%s) different than the current client (%s).',
+                    $client,
+                    self::$options['client']
                 )
             );
         }
+        $baseUrl = 'http://nmp-ihm.'.strtolower($client).'.'.strtolower($this->onServer($server)).'.canaltp.fr';
         $this->setMinkParameter('base_url', strtr($baseUrl, array(' ', '')));
+        $this->inLocale($locale);
+    }
+
+    /**
+     * Using a specific server
+     *
+     * @Given /^(?:|I am )on "(?P<server>(?:[^"]|\\")*)" server$/
+     */
+    public function onServer($server = null)
+    {
+        if (empty($server)) {
+            $server = self::$options['server'];
+        } else {
+            if (!in_array($server, self::$allowed['servers'])) {
+                throw new \Exception('Website server "'.$server.'" not found.');
+            } elseif ($server !== self::$options['server']) {
+                throw new PendingException(
+                    sprintf(
+                        'SKIPPED: server (%s) different than the current server (%s).',
+                        $server,
+                        self::$options['server']
+                    )
+                );
+            }
+        }
+
+        return $server;
+    }
+
+    /**
+     * Using a specific locale
+     *
+     * @Given /^in locale "(?P<locale>(?:[^"]|\\")*)"$/
+     */
+    public function inLocale($locale = null)
+    {
+        if ($locale !== '') {
+            if (empty($locale)) {
+                $locale = self::$options['locale'];
+            } else {
+                if (!in_array($locale, self::$allowed['locales'])) {
+                    throw new \Exception('Website locale "'.$locale.'" not found.');
+                }
+            }
+        }
+        $baseUrl = $this->getMinkParameter('base_url');
+        $baseUrl = parse_url($baseUrl, PHP_URL_SCHEME).'://'.parse_url($baseUrl, PHP_URL_HOST);
+        if (!empty($locale)) {
+            $baseUrl .= '/'.$locale;
+        }
+        $this->setMinkParameter('base_url', $baseUrl);
     }
 
     /**
