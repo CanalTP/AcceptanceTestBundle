@@ -5,10 +5,21 @@ canal_tp_nmp_acceptance_test:
                 from: Caen
                 to: Ouistreham
                 expected: ~
+            1:
+                from: Caen
+                to: Ouistreham
+                expected: toolbox
+            2:
+                from: 5 Boulevard du Bois
+                to: 10 Boulevard du Val
+                expected: walking_details
         schedule:
             0:
                 stop_area: Caen
                 expected: ~
+            1:
+                stop_area: Caen
+                expected: toolbox
         multimodal: ~
         line_schedule:
             0:
@@ -16,6 +27,11 @@ canal_tp_nmp_acceptance_test:
                 line: 01 Reine Mathilde - Gare
                 route: Reine Mathilde - Ste Patrice - Gare
                 expected: ~
+            1:
+                network: Bybus (Ville de Bayeux)
+                line: 01 Reine Mathilde - Gare
+                route: Reine Mathilde - Ste Patrice - Gare
+                expected: toolbox
         proximity:
             0:
                 uri: Caen

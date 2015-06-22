@@ -5,10 +5,21 @@ canal_tp_nmp_acceptance_test:
                 from: Rezé
                 to: Commerce
                 expected: ~
+            1:
+                from: Rezé
+                to: Commerce
+                expected: toolbox
+            2:
+                from: 1 boulevard Auger
+                to: 20 avenue Carnot
+                expected: walking_details
         schedule:
             0:
-                stop_area: Rezé
+                stop_area: Commerce
                 expected: ~
+            1:
+                stop_area: Commerce
+                expected: toolbox
         multimodal: ~
         line_schedule:
             0:
@@ -16,6 +27,11 @@ canal_tp_nmp_acceptance_test:
                 line: LRA FAVEROLLES > VALENCAY > CHATEAUROUX
                 route: CHATEAUROUX > VALENCAY > FAVEROLLES
                 expected: ~
+            1:
+                network: Ailebleue - CG36
+                line: LRA FAVEROLLES > VALENCAY > CHATEAUROUX
+                route: CHATEAUROUX > VALENCAY > FAVEROLLES
+                expected: toolbox
         proximity:
             0:
                 uri: Rezé
