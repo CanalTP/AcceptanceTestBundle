@@ -11,7 +11,6 @@ use Behat\Behat\Output\ServiceContainer\Formatter\JUnitFormatterFactory;
 use Behat\Behat\Output\ServiceContainer\Formatter\PrettyFormatterFactory;
 use Behat\Behat\Output\ServiceContainer\Formatter\ProgressFormatterFactory;
 use Behat\Behat\Snippet\ServiceContainer\SnippetExtension;
-use Behat\Behat\Tester\ServiceContainer\TesterExtension;
 use Behat\Behat\Transformation\ServiceContainer\TransformationExtension;
 use Behat\Behat\Translator\ServiceContainer\GherkinTranslationsExtension;
 use Behat\Testwork\ApplicationFactory as BaseFactory;
@@ -29,6 +28,7 @@ use Behat\Testwork\Specification\ServiceContainer\SpecificationExtension;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
 use Behat\Testwork\Translator\ServiceContainer\TranslatorExtension;
 use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Gherkin\ServiceContainer\NmpGherkinExtension;
+use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\ServiceContainer\TesterExtension;
 
 /**
  * Defines the way behat is created.

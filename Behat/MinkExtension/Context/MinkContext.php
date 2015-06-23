@@ -6,7 +6,7 @@ use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Behat\Tester\Exception\PendingException;
+use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
 
 /**
  * Mink context for Behat BDD tool.
@@ -108,7 +108,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             throw new \Exception('Website client "'.$client.'" not found.');
         }
         if (!empty($client) && $client !== self::$options['client']) {
-            throw new PendingException(
+            throw new SkippedException(
                 sprintf(
                     'SKIPPED: client (%s) different than the current client (%s).',
                     $client,
@@ -134,7 +134,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             if (!in_array($server, self::$allowed['servers'])) {
                 throw new \Exception('Website server "'.$server.'" not found.');
             } elseif ($server !== self::$options['server']) {
-                throw new PendingException(
+                throw new SkippedException(
                     sprintf(
                         'SKIPPED: server (%s) different than the current server (%s).',
                         $server,
