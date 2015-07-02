@@ -13,6 +13,10 @@ canal_tp_nmp_acceptance_test:
                 from: 140 Rue des Hauts Pavés
                 to: 6 Chemin de la Houssinière
                 expected: walking_details
+            3:
+                from: Mangin (Nantes)
+                to: Commerce (Nantes)
+                expected: geovelo
         schedule:
             0:
                 stop_area: Nantes
