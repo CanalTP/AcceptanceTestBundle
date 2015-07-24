@@ -14,10 +14,5 @@
     },
     "autoload": {
         "psr-4": { "CanalTP\\NmpAcceptanceTestBundle\\": "" }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.0-dev"
-        }
     }
 }
