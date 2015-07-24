@@ -18,10 +18,5 @@
     },
     "autoload": {
         "psr-4": { "CanalTP\\AcceptanceTestBundle\\": "" }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.0-dev"
-        }
     }
 }
