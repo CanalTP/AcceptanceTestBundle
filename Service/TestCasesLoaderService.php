@@ -15,12 +15,15 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
  */
 class TestCasesLoaderService extends ContainerAware
 {
+    private $testCasesPath;
+
     /**
      * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(ContainerInterface $container, $testCasesPath)
     {
         $this->setContainer($container);
+        $this->testCasesPath = $testCasesPath;
     }
 
     /**
@@ -51,6 +54,6 @@ class TestCasesLoaderService extends ContainerAware
      */
     private function getTestCasesFile($client)
     {
-        return __DIR__.'/../Resources/config/test_cases/'.strtolower($client).'.yml';
+        return $this->testCasesPath.'/'.strtolower($client).'.yml';
     }
 }
