@@ -11,6 +11,7 @@
     <services>
         <service id="canaltp.test_cases_loader" class="%canaltp.test_cases_loader.class%">
             <argument type="service" id="service_container" />
+            <argument type="string">%behat.test_cases_path%</argument>
         </service>
     </services>
 
