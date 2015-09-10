@@ -470,7 +470,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $cookie = $this->getSession()->getCookie($name);
 
         if ($cookie < $timestamp) {
-            Throw new \Exception('The cooke expire in less than expected ('. date('d m Y', $cookie) .')');
+            throw new \Exception('The cooke expire in less than expected ('. date('d m Y', $cookie) .')');
         }
 
         return $cookie;
