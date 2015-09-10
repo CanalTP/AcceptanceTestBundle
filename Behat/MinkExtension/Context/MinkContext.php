@@ -449,7 +449,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      *
      * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" that expire in less than "(?P<timestamp>[^"]*)"$/
      */
-    protected function cookieThatExpireInLessThan($name, $timestamp)
+    public function cookieThatExpireInLessThan($name, $timestamp)
     {
         $cookie = $this->getSession()->getCookie($name);
 
@@ -465,7 +465,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      *
      * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" that expire in more than "(?P<timestamp>[^"]*)"$/
      */
-    protected function cookieThatExpireInMoreThan($name, $timestamp)
+    public function cookieThatExpireInMoreThan($name, $timestamp)
     {
         $cookie = $this->getSession()->getCookie($name);
 
