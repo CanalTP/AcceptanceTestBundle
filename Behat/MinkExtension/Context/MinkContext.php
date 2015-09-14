@@ -391,7 +391,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      *
      * @When /^(?:|I) click on "(?P<element>[^"]*)"$/
      */
-    public function iClickOn($element)
+    public function clickOn($element)
     {
         $this->assertSession()->elementExists("css", $element)->click();
     }
