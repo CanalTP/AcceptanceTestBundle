@@ -98,8 +98,11 @@ class BehatCommand extends ContainerAwareCommand
             );
             exit(1);
         }
-        $testCasesLoader = $container->get('canaltp.test_cases_loader');
-        $testCases = $testCasesLoader->getTestCases(MinkContext::$options['client']);
+        $testCases = array();
+        if ($container->getParameter('behat.test_cases_path')) {
+            $testCasesLoader = $container->get('canaltp.test_cases_loader');
+            $testCases = $testCasesLoader->getTestCases(MinkContext::$options['client']);
+        }
         $factory = new ApplicationFactory($testCases);
         $factory->createApplication()->run(new ArrayInput($args));
     }

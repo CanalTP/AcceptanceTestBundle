@@ -50,7 +50,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $this->getSession()->reset();
         if ($this->getMinkParameter('base_url') === null) {
             $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
-        } else {
+        } else if (!is_null(self::$options['locale'])) {
             $this->inLocale(self::$options['locale']);
         }
         parent::beforeScenario($event);

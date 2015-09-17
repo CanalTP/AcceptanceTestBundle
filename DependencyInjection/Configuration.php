@@ -60,7 +60,7 @@ class Configuration implements ConfigurationInterface
                     ->end()
                 ->end()
                 ->scalarNode('test_cases_path')
-                    ->defaultValue('%kernel.root_dir%/config/test_cases')
+                    ->defaultValue('')
                 ->end()
             ->end()
         ->end();
