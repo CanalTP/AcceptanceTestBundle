@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Service;
+namespace CanalTP\AcceptanceTestBundle\Service;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -15,15 +15,12 @@ use Symfony\Component\Translation\Exception\NotFoundResourceException;
  */
 class TestCasesLoaderService extends ContainerAware
 {
-    private $testCasesPath;
-
     /**
      * {@inheritdoc}
      */
-    public function __construct(ContainerInterface $container, $testCasesPath)
+    public function __construct(ContainerInterface $container)
     {
         $this->setContainer($container);
-        $this->testCasesPath = $testCasesPath;
     }
 
     /**
@@ -41,8 +38,8 @@ class TestCasesLoaderService extends ContainerAware
             $parser = new Parser();
             $yaml = $parser->parse(file_get_contents($file));
 
-            return !empty($yaml['canal_tp_nmp_acceptance_test']['test_cases']) ?
-                $yaml['canal_tp_nmp_acceptance_test']['test_cases'] : array();
+            return !empty($yaml['canal_tp_acceptance_test']['test_cases']) ?
+                $yaml['canal_tp_acceptance_test']['test_cases'] : array();
         }
     }
 
@@ -54,6 +51,6 @@ class TestCasesLoaderService extends ContainerAware
      */
     private function getTestCasesFile($client)
     {
-        return $this->testCasesPath.'/'.strtolower($client).'.yml';
+        return __DIR__.'/../Resources/config/test_cases/'.strtolower($client).'.yml';
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
+namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 
 use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Mink\Driver\Selenium2Driver;

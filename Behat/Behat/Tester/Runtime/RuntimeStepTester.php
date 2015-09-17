@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\Runtime;
+namespace CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Runtime;
 
 use Behat\Behat\Definition\Call\DefinitionCall;
 use Behat\Behat\Definition\DefinitionFinder;
@@ -17,7 +17,7 @@ use Behat\Testwork\Call\CallCenter;
 use Behat\Testwork\Environment\Environment;
 use Behat\Testwork\Tester\Setup\SuccessfulSetup;
 use Behat\Testwork\Tester\Setup\SuccessfulTeardown;
-use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\Result\ExecutedStepResult;
+use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Result\ExecutedStepResult;
 
 /**
  * Tester executing step tests in the runtime.

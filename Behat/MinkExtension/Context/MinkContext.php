@@ -1,12 +1,12 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
+namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
+use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
 
 /**
  * Mink context for Behat BDD tool.

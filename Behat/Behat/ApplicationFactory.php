@@ -1,11 +1,10 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\Behat;
+namespace CanalTP\AcceptanceTestBundle\Behat\Behat;
 
 use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Behat\Behat\Definition\ServiceContainer\DefinitionExtension;
 use Behat\Behat\EventDispatcher\ServiceContainer\EventDispatcherExtension;
-use Behat\Behat\Gherkin\ServiceContainer\GherkinExtension;
 use Behat\Behat\Hook\ServiceContainer\HookExtension;
 use Behat\Behat\Output\ServiceContainer\Formatter\JUnitFormatterFactory;
 use Behat\Behat\Output\ServiceContainer\Formatter\PrettyFormatterFactory;
@@ -27,8 +26,8 @@ use Behat\Testwork\ServiceContainer\ServiceProcessor;
 use Behat\Testwork\Specification\ServiceContainer\SpecificationExtension;
 use Behat\Testwork\Suite\ServiceContainer\SuiteExtension;
 use Behat\Testwork\Translator\ServiceContainer\TranslatorExtension;
-use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Gherkin\ServiceContainer\NmpGherkinExtension;
-use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\ServiceContainer\TesterExtension;
+use CanalTP\AcceptanceTestBundle\Behat\Behat\Gherkin\ServiceContainer\GherkinExtension;
+use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\ServiceContainer\TesterExtension;
 
 /**
  * Defines the way behat is created.
@@ -100,7 +99,7 @@ final class ApplicationFactory extends BaseFactory
             new EventDispatcherExtension($processor),
             new HookExtension(),
             new TransformationExtension($processor),
-            new NmpGherkinExtension($this->testCases),
+            new GherkinExtension($this->testCases),
         );
     }
 

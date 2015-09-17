@@ -1,15 +1,15 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Command;
+namespace CanalTP\AcceptanceTestBundle\Command;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
-use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\MinkContext;
-use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\TraceContext;
-use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\ApplicationFactory;
+use CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context\MinkContext;
+use CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context\TraceContext;
+use CanalTP\AcceptanceTestBundle\Behat\Behat\ApplicationFactory;
 
 /**
  * Behat command with additional options (--client, --server, --locale, --no-jdr, --trace)

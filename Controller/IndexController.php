@@ -1,11 +1,11 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Controller;
+namespace CanalTP\AcceptanceTestBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
- * IndexController for NmpAcceptanceTest
+ * IndexController for AcceptanceTest
  * User interface for visualizing tests in behat format
  *
  * @author Thomas Noury <thomas.noury@canaltp.fr>
@@ -22,7 +22,7 @@ class IndexController extends Controller
     {
         $bundles = $this->browseBundles('../src/CanalTP');
 
-        return $this->render('CanalTPNmpAcceptanceTestBundle:Index:index.html.twig', array('bundles' => $bundles));
+        return $this->render('CanalTPAcceptanceTestBundle:Index:index.html.twig', array('bundles' => $bundles));
     }
 
     /**

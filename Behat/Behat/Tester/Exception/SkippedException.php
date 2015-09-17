@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\Exception;
+namespace CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception;
 
 use Behat\Testwork\Tester\Exception\TesterException;
 use RuntimeException;

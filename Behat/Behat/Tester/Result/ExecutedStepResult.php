@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\Result;
+namespace CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Result;
 
 use Behat\Behat\Definition\SearchResult;
 use Behat\Testwork\Call\CallResult;

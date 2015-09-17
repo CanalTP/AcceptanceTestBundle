@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\Gherkin;
+namespace CanalTP\AcceptanceTestBundle\Behat\Gherkin;
 
 use Behat\Gherkin\Node\ExampleTableNode;
 use Behat\Gherkin\Lexer;
@@ -18,7 +18,7 @@ use Behat\Gherkin\Parser as BaseParser;
  * Gherkin parser.
  *
  * $lexer  = new Behat\Gherkin\Lexer($keywords);
- * $parser = new CanalTP\NmpAcceptanceTest\Behat\Gherkin\Parser($lexer);
+ * $parser = new CanalTP\AcceptanceTest\Behat\Gherkin\Parser($lexer);
  * $featuresArray = $parser->parse('/path/to/feature.feature');
  *
  * @author Vincent Catillon <vincent.catillon@canaltp.fr>

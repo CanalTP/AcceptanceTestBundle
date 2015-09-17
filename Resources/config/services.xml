@@ -5,13 +5,12 @@
     xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
 
     <parameters>
-        <parameter key="canaltp.test_cases_loader.class">CanalTP\NmpAcceptanceTestBundle\Service\TestCasesLoaderService</parameter>
+        <parameter key="canaltp.test_cases_loader.class">CanalTP\AcceptanceTestBundle\Service\TestCasesLoaderService</parameter>
     </parameters>
 
     <services>
         <service id="canaltp.test_cases_loader" class="%canaltp.test_cases_loader.class%">
             <argument type="service" id="service_container" />
-            <argument type="string">%behat.test_cases_path%</argument>
         </service>
     </services>
 

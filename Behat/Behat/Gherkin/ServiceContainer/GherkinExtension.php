@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Gherkin\ServiceContainer;
+namespace CanalTP\AcceptanceTestBundle\Behat\Behat\Gherkin\ServiceContainer;
 
 use Behat\Testwork\ServiceContainer\Extension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Vincent Catillon <vincent.catillon@canaltp.fr>
  */
-final class NmpGherkinExtension implements Extension
+final class GherkinExtension implements Extension
 {
     /**
      * Test cases
@@ -38,7 +38,7 @@ final class NmpGherkinExtension implements Extension
      */
     public function getConfigKey()
     {
-        return 'nmp_gherkin';
+        return 'gherkin';
     }
 
     /**
@@ -79,7 +79,7 @@ final class NmpGherkinExtension implements Extension
     private function loadParser(ContainerBuilder $container)
     {
         $definition = new Definition(
-            'CanalTP\NmpAcceptanceTestBundle\Behat\Gherkin\Parser',
+            'CanalTP\AcceptanceTestBundle\Behat\Gherkin\Parser',
             array(
                 new Reference('gherkin.lexer'),
                 $this->testCases,
