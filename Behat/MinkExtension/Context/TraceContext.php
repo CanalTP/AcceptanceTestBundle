@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
+namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 
 use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Mink\Driver\Selenium2Driver;
@@ -186,6 +186,7 @@ class TraceContext extends BaseMinkContext
      *
      * @param string $stepName
      * @return array
+     * @throws \Exception
      */
     private function getPageContent($stepName)
     {
@@ -194,7 +195,7 @@ class TraceContext extends BaseMinkContext
         if ($driver instanceof Selenium2Driver) {
             $stepFiles = array();
             foreach (self::$outputTypes as $outputType) {
-                switch ($outputType){
+                switch ($outputType) {
                     case 'png':
                         $stepFiles[$stepName.'.png'] = $driver->getScreenshot();
                         break;

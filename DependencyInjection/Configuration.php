@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\DependencyInjection;
+namespace CanalTP\AcceptanceTestBundle\DependencyInjection;
 
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
@@ -18,7 +18,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $treeBuilder->root('canal_tp_nmp_acceptance_test')
+        $treeBuilder->root('canal_tp_acceptance_test')
             ->addDefaultsIfNotSet()
             ->children()
                 ->arrayNode('clients')

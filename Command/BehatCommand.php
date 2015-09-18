@@ -1,15 +1,15 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Command;
+namespace CanalTP\AcceptanceTestBundle\Command;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\ArrayInput;
-use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\MinkContext;
-use CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context\TraceContext;
-use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\ApplicationFactory;
+use CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context\MinkContext;
+use CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context\TraceContext;
+use CanalTP\AcceptanceTestBundle\Behat\Behat\ApplicationFactory;
 
 /**
  * Behat command with additional options (--client, --server, --locale, --no-jdr, --trace)
@@ -98,8 +98,11 @@ class BehatCommand extends ContainerAwareCommand
             );
             exit(1);
         }
-        $testCasesLoader = $container->get('canaltp.test_cases_loader');
-        $testCases = $testCasesLoader->getTestCases(MinkContext::$options['client']);
+        $testCases = array();
+        if ($container->getParameter('behat.test_cases_path')) {
+            $testCasesLoader = $container->get('canaltp.test_cases_loader');
+            $testCases = $testCasesLoader->getTestCases(MinkContext::$options['client']);
+        }
         $factory = new ApplicationFactory($testCases);
         $factory->createApplication()->run(new ArrayInput($args));
     }

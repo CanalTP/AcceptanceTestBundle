@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Behat\MinkExtension\Context;
+namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Exception\ElementException;
@@ -8,7 +8,7 @@ use Behat\Mink\Exception\Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use CanalTP\NmpAcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
+use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
 
 /**
  * Mink context for Behat BDD tool.
@@ -52,7 +52,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $this->getSession()->reset();
         if ($this->getMinkParameter('base_url') === null) {
             $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
-        } else {
+        } else if (!is_null(self::$options['locale'])) {
             $this->inLocale(self::$options['locale']);
         }
         parent::beforeScenario($event);

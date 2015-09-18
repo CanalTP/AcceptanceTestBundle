@@ -1,6 +1,6 @@
 <?php
 
-namespace CanalTP\NmpAcceptanceTestBundle\Service;
+namespace CanalTP\AcceptanceTestBundle\Service;
 
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -41,8 +41,8 @@ class TestCasesLoaderService extends ContainerAware
             $parser = new Parser();
             $yaml = $parser->parse(file_get_contents($file));
 
-            return !empty($yaml['canal_tp_nmp_acceptance_test']['test_cases']) ?
-                $yaml['canal_tp_nmp_acceptance_test']['test_cases'] : array();
+            return !empty($yaml['canal_tp_acceptance_test']['test_cases']) ?
+                $yaml['canal_tp_acceptance_test']['test_cases'] : array();
         }
     }
 
