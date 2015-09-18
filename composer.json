@@ -1,11 +1,11 @@
 {
     "name": "canaltp/acceptance-test-bundle",
     "type": "library",
-    "description": "Acceptance test",
+    "description": "Canal TP Acceptance Test Bundle",
     "license": "proprietary",
     "authors": [
         {
-            "name": "Catillon Vincent",
+            "name": "Vincent Catillon",
             "email": "vincent.catillon@canaltp.fr"
         },
         {
@@ -16,6 +16,13 @@
     "require": {
         "behat/behat": "~3.0"
     },
+    "minimum-stability": "stable",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "http://packagist.canaltp.fr"
+        }
+    ],
     "autoload": {
         "psr-4": { "CanalTP\\AcceptanceTestBundle\\": "" }
     }
