@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\Reference;
  *
  * @author Vincent Catillon <vincent.catillon@canaltp.fr>
  */
-final class GherkinExtension implements Extension
+final class CtpGherkinExtension implements Extension
 {
     /**
      * Test cases
@@ -38,7 +38,7 @@ final class GherkinExtension implements Extension
      */
     public function getConfigKey()
     {
-        return 'gherkin';
+        return 'ctp_gherkin';
     }
 
     /**
