@@ -3,6 +3,8 @@
 namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Mink\Exception\ElementException;
+use Behat\Mink\Exception\Exception;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
@@ -39,7 +41,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      *
      * @var KernelInterface $kernel
      */
-    private $kernel;
+    protected $kernel;
 
     /**
      * @BeforeScenario
@@ -184,13 +186,13 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
-     * Click on element with specified CSS
+     * Checks, that element with specified CSS don't exist on page.
      *
-     * @When /^(?:|I )click on "(?P<id>(?:[^"]|\\")*)"$/
+     * @Then /^(?:|The )"(?P<element>[^"]*)" element is not set$/
      */
-    public function clickOn($element)
+    public function assertElementIsNotSet($element)
     {
-        $this->assertSession()->elementExists('css', $element)->click();
+        $this->assertSession()->elementNotExists('css', $element);
     }
 
     /**
@@ -385,6 +387,16 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
+     * click on css element
+     *
+     * @When /^(?:|I) click on "(?P<element>[^"]*)"$/
+     */
+    public function clickOn($element)
+    {
+        $this->assertSession()->elementExists("css", $element)->click();
+    }
+
+    /**
      * Form submit function
      *
      * @When /^I submit the "(?P<form>[^"]*)" form$/
@@ -430,5 +442,37 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
 
         throw new \Exception('Timeout thrown during the step');
+    }
+
+    /**
+     * Cookie expiration time (if time is in the value)
+     *
+     * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" that expire in less than "(?P<timestamp>[^"]*)"$/
+     */
+    public function cookieThatExpireInLessThan($name, $timestamp)
+    {
+        $cookie = $this->getSession()->getCookie($name);
+
+        if ($cookie > $timestamp) {
+            throw new \Exception('The cookie expire in more than expected ('. date('d m Y', $cookie) .')');
+        }
+
+        return $cookie;
+    }
+
+    /**
+     * Cookie expiration time (if time is in the value)
+     *
+     * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" that expire in more than "(?P<timestamp>[^"]*)"$/
+     */
+    public function cookieThatExpireInMoreThan($name, $timestamp)
+    {
+        $cookie = $this->getSession()->getCookie($name);
+
+        if ($cookie < $timestamp) {
+            throw new \Exception('The cooke expire in less than expected ('. date('d m Y', $cookie) .')');
+        }
+
+        return $cookie;
     }
 }
