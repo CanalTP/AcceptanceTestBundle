@@ -1,5 +1,5 @@
 {
-    "name": "canaltp/acceptance-test",
+    "name": "canaltp/acceptance-test-bundle",
     "type": "library",
     "description": "Acceptance test",
     "license": "proprietary",
