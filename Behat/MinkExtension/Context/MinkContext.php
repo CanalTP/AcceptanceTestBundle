@@ -487,4 +487,16 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             throw new ExpectationException('Element '.$element.' is not at last position', $this->getSession());
         }
     }
+
+    /**
+     * @Then The :element1 element is placed after :element2 element
+     */
+    public function theElementIsPlacedAfterElement($element1, $element2)
+    {
+        $el = $this->getSession()->getPage()->find('css', $element2.' + '.$element1);
+
+        if (!($el instanceof NodeElement)) {
+            throw new ExpectationException('Element '.$element1.' is not placed after '.$element2, $this->getSession());
+        }
+    }
 }
