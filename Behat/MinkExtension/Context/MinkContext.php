@@ -3,12 +3,13 @@
 namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 
 use Behat\Behat\Context\SnippetAcceptingContext;
-use Behat\Mink\Exception\ElementException;
 use Behat\Mink\Exception\Exception;
+use Behat\Mink\Exception\ExpectationException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
+use Behat\Mink\Element\NodeElement;
 
 /**
  * Mink context for Behat BDD tool.
@@ -473,5 +474,17 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
 
         return $cookie;
+    }
+
+    /**
+     * @Then The :element element is the last child
+     */
+    public function theElementIsTheLastChild($element)
+    {
+        $el = $this->getSession()->getPage()->find('css', $element.':last-child');
+
+        if (!($el instanceof NodeElement)) {
+            throw new ExpectationException('Element '.$element.' is not at last position', $this->getSession());
+        }
     }
 }
