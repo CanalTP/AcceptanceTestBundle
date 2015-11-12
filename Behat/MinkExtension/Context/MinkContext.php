@@ -77,6 +77,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             );
         }
         $this->timeouts = $container->getParameter('behat.timeouts');
+        $this->roles = $container->getParameter('behat.roles');
     }
 
     /**
@@ -96,7 +97,16 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             case 'translator':
                 break;
             case 'user':
-                break;
+                if (isset($this->roles['user'])) {
+                    $this->visit('/login');
+                    $username = $this->roles['user']['username'];
+                    $password = $this->roles['user']['password'];
+                    $this->fillField('_username', $username);
+                    $this->fillField('_password', $password);
+                    $this->clickOn('form button[type=submit]');
+                }
+                else
+                    throw new \Exception('Role user not found.');
         }
     }
 
