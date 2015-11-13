@@ -33,5 +33,6 @@ class CanalTPAcceptanceTestExtension extends Extension
         $container->setParameter('behat.options', $config['options']);
         $container->setParameter('behat.timeouts', $config['timeouts']);
         $container->setParameter('behat.test_cases_path', $config['test_cases_path']);
+        $container->setParameter('behat.roles', $config['roles']);
     }
 }
