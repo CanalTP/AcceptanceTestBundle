@@ -99,9 +99,9 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             case 'user':
                 if (isset($this->roles['user'])) {
                     $this->visit('/login');
-                    $username = $this->roles['user']['username'];
+                    $login = $this->roles['user']['login'];
                     $password = $this->roles['user']['password'];
-                    $this->fillField('_username', $username);
+                    $this->fillField('_username', $login);
                     $this->fillField('_password', $password);
                     $this->clickOn('form button[type=submit]');
                 }

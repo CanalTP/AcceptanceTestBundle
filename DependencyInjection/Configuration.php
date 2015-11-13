@@ -67,7 +67,7 @@ class Configuration implements ConfigurationInterface
                     ->prototype('array')
                         ->addDefaultsIfNotSet()
                         ->children()
-                            ->scalarNode('username')
+                            ->scalarNode('login')
                                 ->defaultNull()
                             ->end()
                             ->scalarNode('password')
