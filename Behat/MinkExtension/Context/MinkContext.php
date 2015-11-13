@@ -87,26 +87,19 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function logAs($role)
     {
-        switch ($role) {
-            case 'super_admin':
-                break;
-            case 'admin':
-                break;
-            case 'visitor':
-                break;
-            case 'translator':
-                break;
-            case 'user':
-                if (isset($this->roles['user'])) {
-                    $this->visit('/login');
-                    $login = $this->roles['user']['login'];
-                    $password = $this->roles['user']['password'];
-                    $this->fillField('_username', $login);
-                    $this->fillField('_password', $password);
-                    $this->clickOn('form button[type=submit]');
-                }
-                else
-                    throw new \Exception('Role user not found.');
+        if (empty($this->roles[$role])) {
+            throw new \Exception(sprintf('Credentials for the role "%s" missing.', $role));
+        }
+        $this->visit('/login');
+        $login = $this->roles[$role]['login'];
+        $password = $this->roles[$role]['password'];
+        $this->fillField('_username', $login);
+        $this->fillField('_password', $password);
+        $this->clickOn('form button[type=submit]');
+        try {
+            $this->redirectedTo('/user/');
+        } catch(ExpectationException $e) {
+            throw new \Exception(sprintf('Login with the role "%s" failure.', $role));
         }
     }
 
