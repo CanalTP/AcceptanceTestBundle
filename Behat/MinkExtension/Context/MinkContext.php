@@ -32,11 +32,23 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public static $allowed;
     /**
+     * JDR state
+     *
+     * @var boolean $jdr
+     */
+    public static $jdr;
+    /**
      * Timeouts
      *
      * @var array $timeouts
      */
     protected $timeouts;
+    /**
+     * Roles
+     *
+     * @var array $roles
+     */
+    protected $roles;
     /**
      * Application Kernel
      *
@@ -171,6 +183,9 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
         $baseUrl = $this->getMinkParameter('base_url');
         $baseUrl = parse_url($baseUrl, PHP_URL_SCHEME).'://'.parse_url($baseUrl, PHP_URL_HOST);
+        if (self::$jdr) {
+            $baseUrl .= '/app_jdr.php';
+        }
         if (!empty($locale)) {
             $baseUrl .= '/'.$locale;
         }
