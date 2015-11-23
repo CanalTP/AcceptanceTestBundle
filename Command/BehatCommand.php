@@ -33,6 +33,20 @@ class BehatCommand extends ContainerAwareCommand
     public static $args = array('suite', 'profile');
 
     /**
+     * Container
+     *
+     * @var ContainerInterface $container
+     */
+    private $container;
+
+    /**
+     * JDR
+     *
+     * @var boolean $jdr
+     */
+    private $jdr;
+
+    /**
      * {@inheritdoc}
      */
     protected function configure()
@@ -43,7 +57,7 @@ class BehatCommand extends ContainerAwareCommand
         foreach (self::$options as $option) {
             $this->addOption($option, null, InputOption::VALUE_OPTIONAL, 'Website '.$option.'.');
         }
-        $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disable the JDR.');
+        $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disables the JDR.');
         $this->addOption('trace', null, InputOption::VALUE_OPTIONAL, 'Trace output types.');
         foreach (self::$args as $arg) {
             $this->addOption($arg, null, InputOption::VALUE_OPTIONAL, 'Original argument "--'.$arg.'" of Behat.');
@@ -55,20 +69,19 @@ class BehatCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->container = $this->getContainer();
         MinkContext::$allowed = array(
-            'clients' => $this->getContainer()->getParameter('behat.clients'),
-            'servers' => $this->getContainer()->getParameter('behat.servers'),
-            'locales' => $this->getContainer()->getParameter('behat.locales'),
+            'clients' => $this->container->getParameter('behat.clients'),
+            'servers' => $this->container->getParameter('behat.servers'),
+            'locales' => $this->container->getParameter('behat.locales'),
         );
-        MinkContext::$options = $this->getContainer()->getParameter('behat.options');
+        MinkContext::$options = $this->container->getParameter('behat.options');
         foreach (self::$options as $option) {
             if ($input->hasParameterOption('--'.$option)) {
                 MinkContext::$options[$option] = $input->getParameterOption('--'.$option);
             }
         }
-        if ($input->hasParameterOption('--no-jdr')) {
-            /* TODO */
-        }
+        MinkContext::$jdr = !$input->hasParameterOption('--no-jdr');
         if ($input->hasParameterOption('--trace')) {
             TraceContext::$outputTypes = explode('|', $input->getParameterOption('--trace'));
         }
@@ -88,8 +101,7 @@ class BehatCommand extends ContainerAwareCommand
      */
     private function runBehatCommand(array $args = array())
     {
-        $container = $this->getContainer();
-        $rootDir = $container->getParameter('kernel.root_dir');
+        $rootDir = $this->container->getParameter('kernel.root_dir');
         define('BEHAT_BIN_PATH', $rootDir.'/../bin/behat');
         if ((!$loader = $this->includeIfExists($rootDir.'/../vendor/autoload.php')) && (!$loader = $this->includeIfExists($rootDir.'/../../../../autoload.php'))) {
             fwrite(
@@ -99,9 +111,11 @@ class BehatCommand extends ContainerAwareCommand
             exit(1);
         }
         $testCases = array();
-        if ($container->getParameter('behat.test_cases_path')) {
-            $testCasesLoader = $container->get('canaltp.test_cases_loader');
-            $testCases = $testCasesLoader->getTestCases(MinkContext::$options['client']);
+        if ($this->container->getParameter('behat.test_cases_path')) {
+            $testCasesLoader = $this->container->get('canaltp.test_cases_loader');
+            $testCases = $testCasesLoader->getTestCases(
+                MinkContext::$jdr ? 'jdr' : MinkContext::$options['client']
+            );
         }
         $factory = new ApplicationFactory($testCases);
         $factory->createApplication()->run(new ArrayInput($args));
