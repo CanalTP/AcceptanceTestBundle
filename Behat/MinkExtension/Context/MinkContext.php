@@ -10,6 +10,7 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
 use Behat\Mink\Element\NodeElement;
+use Behat\Gherkin\Node\TableNode;
 
 /**
  * Mink context for Behat BDD tool.
@@ -500,6 +501,40 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
 
         if (!($el instanceof NodeElement)) {
             throw new ExpectationException('Element '.$element1.' is not placed after '.$element2, $this->getSession());
+        }
+    }
+
+    /**
+     * @Then the following are visible:
+     */
+    public function fieldsAreVisible(TableNode $table)
+    {
+        foreach ($table->getRowsHash() as $field => $value) {
+            $this->assertElementVisible($field);
+        }
+    }
+
+    /**
+     * @Then the following have errors:
+     */
+    public function fieldsHaveErrors(TableNode $table)
+    {
+        foreach ($table->getRowsHash() as $field => $value) {
+            $el = $this->assertSession()->elementExists('css', '.has-error '.$field);
+            if (!$el->getParent()->find('css', '.error-message')->isVisible()) {
+                throw new ElementNotFoundException($this->getSession(), 'list', 'css', '.error-message');
+            }
+        }
+    }
+
+    /**
+     * @Then the following have not errors:
+     */
+    public function fieldsHaveNotErrors(TableNode $table)
+    {
+        foreach ($table->getRowsHash() as $field => $value) {
+            // check if field is not into .field-container.error
+            $this->assertElementNotOnPage('.field-container.error ' . $field);
         }
     }
 }
