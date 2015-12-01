@@ -520,6 +520,18 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
+     * Selects option in facultative select field with specified id|name|label|value.
+     *
+     * @When /^(?:|I )select "(?P<option>(?:[^"]|\\")*)" from facultative "(?P<select>(?:[^"]|\\")*)"$/
+     */
+    public function selectFacultativeOption($select, $option)
+    {
+        if ($option !== 'default') {
+            parent::selectOption($select, $option);
+        }
+    }
+
+    /**
      * @Then the following are visible:
      */
     public function fieldsAreVisible(TableNode $table)
