@@ -9,6 +9,7 @@ use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
+use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Mink\Element\NodeElement;
 use Behat\Gherkin\Node\TableNode;
 
@@ -547,10 +548,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function fieldsHaveErrors(TableNode $table)
     {
         foreach ($table->getRowsHash() as $field => $value) {
-            $el = $this->assertSession()->elementExists('css', '.has-error '.$field);
-            if (!$el->getParent()->find('css', '.error-message')->isVisible()) {
-                throw new ElementNotFoundException($this->getSession(), 'list', 'css', '.error-message');
-            }
+            $this->assertSession()->elementExists('css', '.has-error '.$field);
         }
     }
 
@@ -561,7 +559,35 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     {
         foreach ($table->getRowsHash() as $field => $value) {
             // check if field is not into .field-container.error
-            $this->assertElementNotOnPage('.field-container.error ' . $field);
+            $this->assertElementNotOnPage($field.'.error');
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertCheckboxChecked($checkbox)
+    {
+        try {
+            parent::assertCheckboxChecked($checkbox);
+        } catch(ElementNotFoundException $e) {
+            if (!$this->assertSession()->elementExists('css', $checkbox)->isChecked()) {
+                throw new ExpectationException(sprintf('Checkbox "%s" is not checked, but it should be.', $checkbox), $this->getSession()->getDriver());
+            }
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function assertCheckboxNotChecked($checkbox)
+    {
+        try {
+            parent::assertCheckboxNotChecked($checkbox);
+        } catch(ElementNotFoundException $e) {
+            if ($this->assertSession()->elementExists('css', $checkbox)->isChecked()) {
+                throw new ExpectationException(sprintf('Checkbox "%s" is checked, but it should not be.', $checkbox), $this->getSession()->getDriver());
+            }
         }
     }
 }
