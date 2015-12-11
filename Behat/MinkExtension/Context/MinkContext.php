@@ -347,6 +347,32 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
+     * Redirection to an external site which host is <host>
+     *
+     * @Then /^(?:|I am )redirected to external site "(?P<host>[^"]*)"$/
+     */
+    public function redirectedToExternalSite($host)
+    {
+        $this->assertHostAddressEquals($host);
+    }
+
+    /**
+     * Checks that current session host address is equals to provided one.
+     *
+     * @param $host only host (ex.: www.canaltp.fr)
+     *
+     * @throws ExpectationException
+     */
+    public function assertHostAddressEquals($host)
+    {
+        $url = parse_url($this->getSession()->getCurrentUrl());
+
+        if ($url['host'] !== $host) {
+            throw new ExpectationException(sprintf('Current host address is "%s", but "%s" expected.', $url['host'], $host), $this->getSession());
+        }
+    }
+
+    /**
      * Cookie creator
      *
      * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" with value "(?P<value>[^"]*)"$/
