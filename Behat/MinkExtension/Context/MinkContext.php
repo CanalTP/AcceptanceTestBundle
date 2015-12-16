@@ -643,7 +643,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     {
         $clients = array();
         foreach (self::$allowed['clients'] as $key => $values) {
-            if (is_array($key)) {
+            if (is_array($values)) {
                 $clients = array_merge($clients, $values);
             } else {
                 $clients[] = $values;
