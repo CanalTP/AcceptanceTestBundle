@@ -124,7 +124,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function forTheClient($client, $server = null, $locale = null)
     {
-        if (!in_array($client, self::$allowed['clients'])) {
+        if (!in_array($client, $this->getClients())) {
             throw new \Exception('Website client "'.$client.'" not found.');
         }
         if (!empty($client) && $client !== self::$options['client']) {
@@ -139,6 +139,28 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $baseUrl = 'http://nmp-ihm.'.strtolower($client).'.'.strtolower($this->onServer($server)).'.canaltp.fr';
         $this->setMinkParameter('base_url', strtr($baseUrl, array(' ', '')));
         $this->inLocale($locale);
+    }
+
+    /**
+     * Using a specific design
+     *
+     * @Given /^for the design "(?P<design>(?:[^"]|\\")*)"$/
+     */
+    public function forTheDesign($design)
+    {
+        if (!in_array($design, array_keys(self::$allowed['clients']))) {
+            throw new \Exception('Website design "'.$design.'" not found.');
+        }
+        $clientDesign = $this->getDesign(self::$options['client']);
+        if (!empty($design) && $design !== $clientDesign) {
+            throw new SkippedException(
+                sprintf(
+                    'SKIPPED: design (%s) different than the current design (%s).',
+                    $design,
+                    $clientDesign
+                )
+            );
+        }
     }
 
     /**
@@ -615,5 +637,37 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 throw new ExpectationException(sprintf('Checkbox "%s" is checked, but it should not be.', $checkbox), $this->getSession()->getDriver());
             }
         }
+    }
+
+    private function getClients()
+    {
+        $clients = array();
+        foreach (self::$allowed['clients'] as $key => $values) {
+            if (is_array($key)) {
+                $clients = array_merge($clients, $values);
+            } else {
+                $clients[] = $values;
+            }
+        }
+
+        return $clients;
+    }
+
+    /**
+     * Design getter from client name
+     *
+     * @param string $client
+     * @return string
+     */
+    private function getDesign($client)
+    {
+        $clientDesign = null;
+        foreach (self::$allowed['clients'] as $design => $clients) {
+            if (is_array($design) && in_array($client, $clients)) {
+                $clientDesign = $design;
+            }
+        }
+
+        return $clientDesign;
     }
 }

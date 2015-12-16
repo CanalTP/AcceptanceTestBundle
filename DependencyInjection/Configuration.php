@@ -23,7 +23,7 @@ class Configuration implements ConfigurationInterface
             ->children()
                 ->arrayNode('clients')
                     ->defaultValue(array())
-                    ->prototype('scalar')
+                    ->prototype('variable')
                     ->end()
                 ->end()
                 ->arrayNode('servers')
