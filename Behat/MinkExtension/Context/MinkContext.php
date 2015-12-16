@@ -462,7 +462,13 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function clickOn($element)
     {
-        $this->assertSession()->elementExists("css", $element)->click();
+        $node = $this->assertSession()->elementExists("css", $element);
+        if ($node->hasAttribute('target') && $node->getAttribute('target') !== '_self') {
+            $path = $node->getAttribute('href');
+            $this->visitPath($path);
+        } else {
+            $node->click();
+        }
     }
 
     /**
