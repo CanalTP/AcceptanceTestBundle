@@ -6,7 +6,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
-use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\ArgvInput;
 use CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context\MinkContext;
 use CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context\TraceContext;
 use CanalTP\AcceptanceTestBundle\Behat\Behat\ApplicationFactory;
@@ -30,7 +30,7 @@ class BehatCommand extends ContainerAwareCommand
      *
      * @var array $args
      */
-    public static $args = array('suite', 'profile');
+    public static $args = array('suite', 'profile', 'tags');
 
     /**
      * Container
@@ -85,10 +85,10 @@ class BehatCommand extends ContainerAwareCommand
         if ($input->hasParameterOption('--trace')) {
             TraceContext::$outputTypes = explode('|', $input->getParameterOption('--trace'));
         }
-        $args = array();
+        $args = array('behat');
         foreach (self::$args as $arg) {
             if ($input->hasParameterOption('--'.$arg)) {
-                $args['--'.$arg] = $input->getParameterOption('--'.$arg);
+                $args[] = '--'.$arg.'='.$input->getParameterOption('--'.$arg);
             }
         }
         $this->runBehatCommand($args);
@@ -118,7 +118,7 @@ class BehatCommand extends ContainerAwareCommand
             );
         }
         $factory = new ApplicationFactory($testCases);
-        $factory->createApplication()->run(new ArrayInput($args));
+        $factory->createApplication()->run(new ArgvInput($args));
     }
 
     /**

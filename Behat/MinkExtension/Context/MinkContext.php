@@ -520,34 +520,16 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
-     * Cookie expiration time (if time is in the value)
-     *
-     * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" that expire in less than "(?P<timestamp>[^"]*)"$/
+     * @When /^I have a cookie "(?P<name>[^"]*)" during "(?P<duration>[^"]*)"$/
      */
-    public function cookieThatExpireInLessThan($name, $timestamp)
+    protected function assertCookieDuration($name, $duration)
     {
-        $cookie = $this->getSession()->getCookie($name);
-        if ($cookie >= $timestamp) {
-            throw new \Exception('The cookie expire in more than expected ('. date('d m Y', $cookie) .')');
+        $datetime = date('d/m/Y', $this->getSession()->getCookie($name));
+        $expectedDatetime = date('d/m/Y', strtotime('+'.$duration));
+
+        if ($datetime !== $expectedDatetime) {
+            throw new \Exception('The cookie expiration date ('.$datetime.') is different than expected ('.$expectedDatetime.').');
         }
-
-        return $cookie;
-    }
-
-    /**
-     * Cookie expiration time (if time is in the value)
-     *
-     * @Then /^(?:|I have )a cookie "(?P<name>[^"]*)" that expire in more than "(?P<timestamp>[^"]*)"$/
-     */
-    public function cookieThatExpireInMoreThan($name, $timestamp)
-    {
-        $cookie = $this->getSession()->getCookie($name);
-
-        if ($cookie <= $timestamp) {
-            throw new \Exception('The cooke expire in less than expected ('. date('d m Y', $cookie) .')');
-        }
-
-        return $cookie;
     }
 
     /**
