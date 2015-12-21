@@ -142,6 +142,34 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
+     * Test will be skipped if current client match one of the given clients
+     *
+     * @Given skip for clients:
+     *
+     * @param TableNode $clientsTable
+     */
+    public function skipForClients(TableNode $clientsTable)
+    {
+        $clients = array();
+        foreach ($clientsTable->getTable() as $table) {
+            $clients[] = $table[0];
+        }
+
+        if (empty($clients)) {
+            throw new \InvalidArgumentException('No client to skip defined');
+        }
+
+        if (in_array(self::$options['client'], $clients)) {
+            throw new SkippedException(
+                sprintf(
+                    'SKIPPED: client (%s) skipped on demand.',
+                    self::$options['client']
+                )
+            );
+        }
+    }
+
+    /**
      * Using a specific design
      *
      * @Given /^for the design "(?P<design>(?:[^"]|\\")*)"$/
@@ -499,9 +527,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      * Wait until function
      *
      * @param integer $timeout
-     * @param Function $callback
-     * @return boolean
-     * @throws Exception
+     * @param $callback
+     * @param array $parameters
+     * @return bool
+     * @throws \Exception
      */
     protected function waitFor($timeout, $callback, $parameters = array())
     {
@@ -600,6 +629,19 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
+     * Then (?:|I) fill "(?<field>)" with date "(?<dateFormat>)"
+     * @Then I fill :field with date :date
+     *
+     * @param $field
+     * @param $dateFormat
+     */
+    public function iFillWithDate($field, $dateFormat)
+    {
+        $date = new \DateTime($dateFormat);
+        $this->getSession()->getPage()->find('css', $field)->setValue($date->format('d/m/Y'));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function assertCheckboxChecked($checkbox)
@@ -651,11 +693,11 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     {
         $clientDesign = null;
         foreach (self::$allowed['clients'] as $design => $clients) {
-            if (is_array($design) && in_array($client, $clients)) {
-                $clientDesign = $design;
+            if (is_array($clients) && in_array($client, $clients)) {
+                return $design;
             }
         }
 
-        return $clientDesign;
+        return '';
     }
 }
