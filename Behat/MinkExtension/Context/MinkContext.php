@@ -127,10 +127,11 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         if (!in_array($client, $this->getClients())) {
             throw new \Exception('Website client "'.$client.'" not found.');
         }
+
         if (!empty($client) && $client !== self::$options['client']) {
             throw new SkippedException(
                 sprintf(
-                    'SKIPPED: client (%s) different than the current client (%s).',
+                    'SKIPPED: client (%s) different than the current tested client (%s).',
                     $client,
                     self::$options['client']
                 )
@@ -180,10 +181,11 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             throw new \Exception('Website design "'.$design.'" not found.');
         }
         $clientDesign = $this->getDesign(self::$options['client']);
+
         if (!empty($design) && $design !== $clientDesign) {
             throw new SkippedException(
                 sprintf(
-                    'SKIPPED: design (%s) different than the current design (%s).',
+                    'SKIPPED: design (%s) different than the current tested design (%s).',
                     $design,
                     $clientDesign
                 )
@@ -694,6 +696,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $clientDesign = null;
         foreach (self::$allowed['clients'] as $design => $clients) {
             if (is_array($clients) && in_array($client, $clients)) {
+
                 return $design;
             }
         }
