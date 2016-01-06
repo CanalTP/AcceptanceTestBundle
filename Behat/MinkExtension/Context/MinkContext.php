@@ -127,10 +127,11 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         if (!in_array($client, $this->getClients())) {
             throw new \Exception('Website client "'.$client.'" not found.');
         }
+
         if (!empty($client) && $client !== self::$options['client']) {
             throw new SkippedException(
                 sprintf(
-                    'SKIPPED: client (%s) different than the current client (%s).',
+                    'SKIPPED: client (%s) different than the current tested client (%s).',
                     $client,
                     self::$options['client']
                 )
@@ -139,6 +140,34 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         $baseUrl = 'http://nmp-ihm.'.strtolower($client).'.'.strtolower($this->onServer($server)).'.canaltp.fr';
         $this->setMinkParameter('base_url', strtr($baseUrl, array(' ', '')));
         $this->inLocale($locale);
+    }
+
+    /**
+     * Test will be skipped if current client match one of the given clients
+     *
+     * @Given skip for clients:
+     *
+     * @param TableNode $clientsTable
+     */
+    public function skipForClients(TableNode $clientsTable)
+    {
+        $clients = array();
+        foreach ($clientsTable->getTable() as $table) {
+            $clients[] = $table[0];
+        }
+
+        if (empty($clients)) {
+            throw new \InvalidArgumentException('No client to skip defined');
+        }
+
+        if (in_array(self::$options['client'], $clients)) {
+            throw new SkippedException(
+                sprintf(
+                    'SKIPPED: client (%s) skipped on demand.',
+                    self::$options['client']
+                )
+            );
+        }
     }
 
     /**
@@ -152,10 +181,11 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             throw new \Exception('Website design "'.$design.'" not found.');
         }
         $clientDesign = $this->getDesign(self::$options['client']);
+
         if (!empty($design) && $design !== $clientDesign) {
             throw new SkippedException(
                 sprintf(
-                    'SKIPPED: design (%s) different than the current design (%s).',
+                    'SKIPPED: design (%s) different than the current tested design (%s).',
                     $design,
                     $clientDesign
                 )
@@ -499,9 +529,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      * Wait until function
      *
      * @param integer $timeout
-     * @param Function $callback
-     * @return boolean
-     * @throws Exception
+     * @param $callback
+     * @param array $parameters
+     * @return bool
+     * @throws \Exception
      */
     protected function waitFor($timeout, $callback, $parameters = array())
     {
@@ -600,6 +631,19 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
+     * Then (?:|I) fill "(?<field>)" with date "(?<dateFormat>)"
+     * @Then I fill :field with date :date
+     *
+     * @param $field
+     * @param $dateFormat
+     */
+    public function iFillWithDate($field, $dateFormat)
+    {
+        $date = new \DateTime($dateFormat);
+        $this->getSession()->getPage()->find('css', $field)->setValue($date->format('d/m/Y'));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function assertCheckboxChecked($checkbox)
@@ -649,13 +693,13 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     private function getDesign($client)
     {
-        $clientDesign = null;
         foreach (self::$allowed['clients'] as $design => $clients) {
-            if (is_array($design) && in_array($client, $clients)) {
-                $clientDesign = $design;
+            if (is_array($clients) && in_array($client, $clients)) {
+
+                return $design;
             }
         }
 
-        return $clientDesign;
+        return '';
     }
 }
