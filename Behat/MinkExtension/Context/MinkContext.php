@@ -693,7 +693,6 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     private function getDesign($client)
     {
-        $clientDesign = null;
         foreach (self::$allowed['clients'] as $design => $clients) {
             if (is_array($clients) && in_array($client, $clients)) {
 
