@@ -30,6 +30,8 @@ class CanalTPAcceptanceTestExtension extends Extension
         $container->setParameter('behat.clients', $config['clients']);
         $container->setParameter('behat.servers', $config['servers']);
         $container->setParameter('behat.locales', $config['locales']);
+        $container->setParameter('behat.screen_sizes', $config['screen_sizes']);
+        $container->setParameter('behat.default_screen_size', $config['default_screen_size']);
         $container->setParameter('behat.options', $config['options']);
         $container->setParameter('behat.timeouts', $config['timeouts']);
         $container->setParameter('behat.test_cases_path', $config['test_cases_path']);
