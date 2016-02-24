@@ -36,6 +36,34 @@ class Configuration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
+                ->arrayNode('screen_sizes')
+                    ->defaultValue(array(
+                        'small' => array(
+                            'width' => 320,
+                            'height' => 580
+                        ),
+                        'large' => array(
+                            'width' => 1600,
+                            'height' => 900
+                        )
+                    ))
+                    ->prototype('array')
+                        ->children()
+                            ->integerNode('width')
+                                ->isRequired()
+                                ->min(0)
+                            ->end()
+                            ->integerNode('height')
+                                ->isRequired()
+                                ->min(0)
+                            ->end()
+                        ->end()
+                    ->end()
+                ->end()
+                ->scalarNode('default_screen_size')
+                    ->defaultValue('large')
+                    ->cannotBeEmpty()
+                ->end()
                 ->arrayNode('options')
                     ->addDefaultsIfNotSet()
                     ->children()

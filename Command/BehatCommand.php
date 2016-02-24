@@ -55,12 +55,12 @@ class BehatCommand extends ContainerAwareCommand
             ->setName('behat:execute')
             ->setDescription('Call Behat with additional options.');
         foreach (self::$options as $option) {
-            $this->addOption($option, null, InputOption::VALUE_OPTIONAL, 'Website '.$option.'.');
+            $this->addOption($option, null, InputOption::VALUE_OPTIONAL, 'Website ' . $option . '.');
         }
         $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disables the JDR.');
         $this->addOption('trace', null, InputOption::VALUE_OPTIONAL, 'Trace output types.');
         foreach (self::$args as $arg) {
-            $this->addOption($arg, null, InputOption::VALUE_OPTIONAL, 'Original argument "--'.$arg.'" of Behat.');
+            $this->addOption($arg, null, InputOption::VALUE_OPTIONAL, 'Original argument "--' . $arg . '" of Behat.');
         }
     }
 
@@ -74,11 +74,12 @@ class BehatCommand extends ContainerAwareCommand
             'clients' => $this->container->getParameter('behat.clients'),
             'servers' => $this->container->getParameter('behat.servers'),
             'locales' => $this->container->getParameter('behat.locales'),
+            'screen_sizes' => $this->container->getParameter('behat.screen_sizes'),
         );
         MinkContext::$options = $this->container->getParameter('behat.options');
         foreach (self::$options as $option) {
-            if ($input->hasParameterOption('--'.$option)) {
-                MinkContext::$options[$option] = $input->getParameterOption('--'.$option);
+            if ($input->hasParameterOption('--' . $option)) {
+                MinkContext::$options[$option] = $input->getParameterOption('--' . $option);
             }
         }
         MinkContext::$jdr = !$input->hasParameterOption('--no-jdr');
@@ -87,8 +88,8 @@ class BehatCommand extends ContainerAwareCommand
         }
         $args = array('behat');
         foreach (self::$args as $arg) {
-            if ($input->hasParameterOption('--'.$arg)) {
-                $args[] = '--'.$arg.'='.$input->getParameterOption('--'.$arg);
+            if ($input->hasParameterOption('--' . $arg)) {
+                $args[] = '--' . $arg . '=' . $input->getParameterOption('--' . $arg);
             }
         }
         $this->runBehatCommand($args);
@@ -102,11 +103,11 @@ class BehatCommand extends ContainerAwareCommand
     private function runBehatCommand(array $args = array())
     {
         $rootDir = $this->container->getParameter('kernel.root_dir');
-        define('BEHAT_BIN_PATH', $rootDir.'/../bin/behat');
-        if ((!$loader = $this->includeIfExists($rootDir.'/../vendor/autoload.php')) && (!$loader = $this->includeIfExists($rootDir.'/../../../../autoload.php'))) {
+        define('BEHAT_BIN_PATH', $rootDir . '/../bin/behat');
+        if ((!$loader = $this->includeIfExists($rootDir . '/../vendor/autoload.php')) && (!$loader = $this->includeIfExists($rootDir . '/../../../../autoload.php'))) {
             fwrite(
                 STDERR,
-                'You must set up the project dependencies, run the following commands:'.PHP_EOL.'curl -s http://getcomposer.org/installer | php'.PHP_EOL.'php composer.phar install'.PHP_EOL
+                'You must set up the project dependencies, run the following commands:' . PHP_EOL . 'curl -s http://getcomposer.org/installer | php' . PHP_EOL . 'php composer.phar install' . PHP_EOL
             );
             exit(1);
         }
