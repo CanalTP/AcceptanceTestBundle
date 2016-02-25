@@ -32,7 +32,6 @@ final class CtpGherkinExtension implements Extension
         $this->testCases = $testCases;
     }
 
-
     /**
      * {@inheritdoc}
      */
@@ -60,6 +59,7 @@ final class CtpGherkinExtension implements Extension
      */
     public function load(ContainerBuilder $container, array $config)
     {
+        $this->loadServices($container);
         $this->loadParser($container);
     }
 
@@ -69,6 +69,19 @@ final class CtpGherkinExtension implements Extension
     public function process(ContainerBuilder $container)
     {
         $this->loadParser($container);
+    }
+
+    /**
+     * Loads services.
+     *
+     * @param ContainerBuilder $container
+     */
+    private function loadServices(ContainerBuilder $container)
+    {
+        $definition = new Definition(
+            'CanalTP\AcceptanceTestBundle\Service\ApiExamplesLoaderService'
+        );
+        $container->setDefinition('canaltp.api_examples_loader', $definition);
     }
 
     /**
@@ -82,7 +95,8 @@ final class CtpGherkinExtension implements Extension
             'CanalTP\AcceptanceTestBundle\Behat\Gherkin\Parser',
             array(
                 new Reference('gherkin.lexer'),
-                $this->testCases,
+                new Reference('canaltp.api_examples_loader'),
+                $this->testCases
             )
         );
         $container->setDefinition('gherkin.parser', $definition);

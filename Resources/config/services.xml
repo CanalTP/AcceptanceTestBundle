@@ -6,6 +6,7 @@
 
     <parameters>
         <parameter key="canaltp.test_cases_loader.class">CanalTP\AcceptanceTestBundle\Service\TestCasesLoaderService</parameter>
+        <parameter key="canaltp.api_loader.class">CanalTP\AcceptanceTestBundle\Service\ApiLoaderService</parameter>
     </parameters>
 
     <services>
@@ -13,6 +14,7 @@
             <argument type="service" id="service_container" />
             <argument type="string">%behat.test_cases_path%</argument>
         </service>
+        <!--<service id="canaltp.api_loader" class="%canaltp.api_loader.class%"></service>-->
     </services>
 
 </container>
