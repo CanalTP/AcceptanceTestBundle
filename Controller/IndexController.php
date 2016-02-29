@@ -20,7 +20,8 @@ class IndexController extends Controller
      */
     public function indexAction()
     {
-        $bundles = $this->browseBundles('../src/CanalTP');
+        $scanDir = $this->container->getParameter('at.ui_scan_dir');
+        $bundles = $this->browseBundles($scanDir);
 
         return $this->render('CanalTPAcceptanceTestBundle:Index:index.html.twig', array('bundles' => $bundles));
     }

@@ -21,6 +21,8 @@ class Configuration implements ConfigurationInterface
         $treeBuilder->root('canal_tp_acceptance_test')
             ->addDefaultsIfNotSet()
             ->children()
+                ->variableNode('ui_scan_dir')
+                ->end()
                 ->arrayNode('clients')
                     ->defaultValue(array())
                     ->prototype('variable')
