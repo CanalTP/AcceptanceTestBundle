@@ -2,6 +2,7 @@
 
 namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 
+use Behat\Mink\Exception\DriverException;
 use Behat\MinkExtension\Context\MinkContext as BaseMinkContext;
 use Behat\Mink\Driver\Selenium2Driver;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
@@ -205,6 +206,11 @@ class TraceContext extends BaseMinkContext
                     default:
                         throw new \Exception('Output type "'.$outputType.'" not supported.');
                 }
+            }
+        } else {
+            try {
+                $stepFiles[$stepName.'.html'] = $driver->getCurrentUrl(). '<br />' .$driver->getContent();
+            } catch (DriverException $e) {
             }
         }
 
