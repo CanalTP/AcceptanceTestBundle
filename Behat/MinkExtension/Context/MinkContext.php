@@ -10,6 +10,7 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Element\NodeElement;
 use Behat\Gherkin\Node\TableNode;
 
@@ -297,7 +298,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             ));
         }
         $screenResolution = self::$allowed['screen_sizes'][$screenSize];
-        $this->getSession()->resizeWindow($screenResolution['width'], $screenResolution['height'], 'current');
+        try {
+            $this->getSession()->resizeWindow($screenResolution['width'], $screenResolution['height'], 'current');
+        } catch (UnsupportedDriverActionException $e) {
+        }
     }
 
     /**
@@ -428,6 +432,15 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
 
         return $object->$property;
+    }
+
+    /**
+     * @Then I should not see more than :count :element element
+     */
+    public function iShouldNotSeeMoreThanElement($count, $element)
+    {
+        $elements = $this->getSession()->getPage()->findAll('css', $element);
+        return (count($elements) <= $count);
     }
 
     /**
