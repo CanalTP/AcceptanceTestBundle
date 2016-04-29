@@ -2,6 +2,7 @@
 
 namespace CanalTP\AcceptanceTestBundle\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,6 +58,7 @@ class BehatCommand extends ContainerAwareCommand
         foreach (self::$options as $option) {
             $this->addOption($option, null, InputOption::VALUE_OPTIONAL, 'Website ' . $option . '.');
         }
+        $this->addArgument('paths', InputArgument::OPTIONAL, 'Optional path(s) to execute.');
         $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disables the JDR.');
         $this->addOption('trace', null, InputOption::VALUE_OPTIONAL, 'Trace output types.');
         foreach (self::$args as $arg) {
@@ -92,6 +94,11 @@ class BehatCommand extends ContainerAwareCommand
                 $args[] = '--' . $arg . '=' . $input->getParameterOption('--' . $arg);
             }
         }
+
+        if ($input->hasArgument('paths')) {
+            $args[] = $input->getArgument('paths');
+        }
+
         $this->runBehatCommand($args);
     }
 
