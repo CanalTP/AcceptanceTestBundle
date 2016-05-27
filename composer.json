@@ -24,6 +24,9 @@
             "url": "http://packagist.canaltp.fr"
         }
     ],
+    "config": {
+        "secure-http": false
+    },
     "autoload": {
         "psr-4": { "CanalTP\\AcceptanceTestBundle\\": "" }
     },
