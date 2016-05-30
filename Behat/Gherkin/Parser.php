@@ -10,6 +10,7 @@
 
 namespace CanalTP\AcceptanceTestBundle\Behat\Gherkin;
 
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Behat\Gherkin\Node\ExampleTableNode;
 use Behat\Gherkin\Lexer;
 use Behat\Gherkin\Parser as BaseParser;
@@ -26,6 +27,13 @@ use Behat\Gherkin\Parser as BaseParser;
 class Parser extends BaseParser
 {
     /**
+     * Api examples loader service
+     *
+     * @var \CanalTP\AcceptanceTestBundle\Service\ApiExamplesLoaderService $apiExamplesLoader
+     */
+    private $apiExamplesLoader = null;
+
+    /**
      * Test cases
      *
      * @var array $testCases
@@ -38,9 +46,10 @@ class Parser extends BaseParser
      * @param Lexer $lexer Lexer instance
      * @param array $testCases Test cases
      */
-    public function __construct(Lexer $lexer, array $testCases = array())
+    public function __construct(Lexer $lexer, $apiExamplesLoader, array $testCases = array())
     {
         parent::__construct($lexer);
+        $this->apiExamplesLoader = $apiExamplesLoader;
         $this->testCases = $testCases;
     }
 
@@ -54,11 +63,21 @@ class Parser extends BaseParser
         $node = parent::parseExamples();
         $table = $node->getTable();
         if (empty($table)) {
-            $module = trim($this->parseText());
-            $node = new ExampleTableNode($this->loadExamplesFromTestCases($module), $node->getKeyword());
+            $keyword = trim($this->parseText());
+            if (strpos($keyword, '/') !== false) {
+                $data = $this->loadExamplesFromApi($keyword);
+            } else {
+                $data = $this->loadExamplesFromTestCases($keyword);
+            }
+            $node = new ExampleTableNode($data, $node->getKeyword());
         }
 
         return $node;
+    }
+
+    private function loadExamplesFromApi($keyword)
+    {
+        return $this->apiExamplesLoader->getExamples($keyword);
     }
 
     /**

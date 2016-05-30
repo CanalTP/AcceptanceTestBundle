@@ -10,7 +10,6 @@ use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use CanalTP\AcceptanceTestBundle\Behat\Behat\Tester\Exception\SkippedException;
 use Behat\Mink\Exception\ElementNotFoundException;
-use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Behat\Mink\Element\NodeElement;
 use Behat\Gherkin\Node\TableNode;
 
@@ -70,11 +69,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         if (!is_null($this->kernel->getContainer()->getParameter('behat.default_screen_size'))) {
             $this->onAScreenSize($this->kernel->getContainer()->getParameter('behat.default_screen_size'));
         }
-        if ($this->getMinkParameter('base_url') === null) {
-            $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
-        } else if (!is_null(self::$options['locale'])) {
-            $this->inLocale(self::$options['locale']);
-        }
+        $this->getBaseUrl();
         parent::beforeScenario($event);
     }
 
@@ -99,6 +94,23 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
         $this->timeouts = $container->getParameter('behat.timeouts');
         $this->roles = $container->getParameter('behat.roles');
+    }
+
+    /**
+     * Base url getter
+     *
+     * @return string
+     * @throws \Exception
+     */
+    public function getBaseUrl()
+    {
+        if ($this->getMinkParameter('base_url') === null) {
+            $this->forTheClient(self::$options['client'], self::$options['server'], self::$options['locale']);
+        } else if (!is_null(self::$options['locale'])) {
+            $this->inLocale(self::$options['locale']);
+        }
+
+        return $this->getMinkParameter('base_url');
     }
 
     /**
