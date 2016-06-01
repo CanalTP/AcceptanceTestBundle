@@ -5,6 +5,7 @@ namespace CanalTP\AcceptanceTestBundle\Behat\MinkExtension\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Mink\Exception\Exception;
 use Behat\Mink\Exception\ExpectationException;
+use Behat\Mink\Exception\UnsupportedDriverActionException;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
