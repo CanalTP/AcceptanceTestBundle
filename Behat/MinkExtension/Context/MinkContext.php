@@ -161,7 +161,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 )
             );
         }
-        $baseUrl = 'http://nmp-ihm.' . strtolower($client) . '.' . strtolower($this->onServer($server)) . '.canaltp.fr';
+        $baseUrl = 'http://nmp-ihm.'.strtolower($client).'.'.strtolower($this->onServer($server)).'.canaltp.fr';
         $this->setMinkParameter('base_url', strtr($baseUrl, array(' ', '')));
         $this->inLocale($locale);
     }
@@ -272,12 +272,12 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
             }
         }
         $baseUrl = $this->getMinkParameter('base_url');
-        $baseUrl = parse_url($baseUrl, PHP_URL_SCHEME) . '://' . parse_url($baseUrl, PHP_URL_HOST);
+        $baseUrl = parse_url($baseUrl, PHP_URL_SCHEME).'://'.parse_url($baseUrl, PHP_URL_HOST);
         if (self::$jdr) {
             $baseUrl .= '/app_jdr.php';
         }
         if (!empty($locale)) {
-            $baseUrl .= '/' . $locale;
+            $baseUrl .= '/'.$locale;
         }
         $this->setMinkParameter('base_url', $baseUrl);
     }
@@ -335,7 +335,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function assertElementVisible($element)
     {
         if (!$this->assertSession()->elementExists('css', $element)->isVisible()) {
-            throw new \Exception('Element "' . $element . '" not visible.');
+            throw new \Exception('Element "'.$element.'" not visible.');
         }
     }
 
@@ -347,7 +347,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function assertElementNotVisible($element)
     {
         if ($this->assertSession()->elementExists('css', $element)->isVisible()) {
-            throw new \Exception('Element "' . $element . '" visible.');
+            throw new \Exception('Element "'.$element.'" visible.');
         }
     }
 
@@ -360,7 +360,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     {
         $html = $this->assertSession()->elementExists('css', $element)->getHtml();
         if (empty($html)) {
-            throw new \Exception('Element "' . $element . '" empty.');
+            throw new \Exception('Element "'.$element.'" empty.');
         }
     }
 
@@ -373,7 +373,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function assertElementChildrenOnPage($element, $children = array())
     {
         foreach ($children as $child) {
-            $this->assertElementOnPage($element . ' ' . $child);
+            $this->assertElementOnPage($element.' '.$child);
         }
     }
 
@@ -386,7 +386,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function assertElementChildrenNotOnPage($element, $children = array())
     {
         foreach ($children as $child) {
-            $this->assertElementNotOnPage($element . ' ' . $child);
+            $this->assertElementNotOnPage($element.' '.$child);
         }
     }
 
@@ -399,7 +399,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function assertElementChildrensVisible($element, $childrens = array())
     {
         foreach ($childrens as $children) {
-            $this->assertElementVisible($element . ' ' . $children);
+            $this->assertElementVisible($element.' '.$children);
         }
     }
 
@@ -412,7 +412,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function assertElementChildrensNotVisible($element, $childrens = array())
     {
         foreach ($childrens as $children) {
-            $this->assertElementNotVisible($element . ' ' . $children);
+            $this->assertElementNotVisible($element.' '.$children);
         }
     }
 
@@ -509,18 +509,18 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function iFillWithAutocomplete($field, $value, $form = null)
     {
-        $fieldId = ($form !== null ? '#ctp-' . $form . 'Form ' : '') . '#' . $field;
-        $this->getSession()->executeScript('CanalTP.jQuery("' . $fieldId . '").val("' . $value . '");');
-        $this->getSession()->executeScript('CanalTP.jQuery("' . $fieldId . '").autocomplete("search");');
+        $fieldId = ($form !== null ? '#ctp-'.$form.'Form ' : '').'#'.$field;
+        $this->getSession()->executeScript('CanalTP.jQuery("'.$fieldId.'").val("'.$value.'");');
+        $this->getSession()->executeScript('CanalTP.jQuery("'.$fieldId.'").autocomplete("search");');
         $target = $this->assertSession()->elementExists('css', $fieldId)->getAttribute('data-target-list');
         $this->waitFor(
             $this->timeouts['autocomplete'] / 1000,
             function ($context, $parameters) {
-                return $context->assertSession()->elementExists('css', '#' . $parameters['target'])->isVisible();
+                return $context->assertSession()->elementExists('css', '#'.$parameters['target'])->isVisible();
             },
             array('target' => $target)
         );
-        $this->clickOn('#' . $target . ' .ui-autocomplete-item-0 a');
+        $this->clickOn('#'.$target.' .ui-autocomplete-item-0 a');
     }
 
     /**
@@ -531,9 +531,9 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function iFillWithOption($field, $value, $target = null)
     {
         $this->getSession()->executeScript(
-            'CanalTP.jQuery("#' . $field . ' option").each(function() {
-                if (CanalTP.jQuery.trim(this.value) === "' . trim($value) . '" || CanalTP.jQuery.trim(this.text) === "' . trim($value) . '") {
-                    CanalTP.jQuery("#' . $field . '").val(this.value).change();
+            'CanalTP.jQuery("#'.$field.' option").each(function() {
+                if (CanalTP.jQuery.trim(this.value) === "'.trim($value).'" || CanalTP.jQuery.trim(this.text) === "'.trim($value).'") {
+                    CanalTP.jQuery("#'.$field.'").val(this.value).change();
                 }
             });'
         );
@@ -542,7 +542,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 $this->timeouts['ajax'] / 1000,
                 function ($context, $parameters) {
                     try {
-                        $target = $context->assertSession()->elementExists('css', '#' . $parameters['target']);
+                        $target = $context->assertSession()->elementExists('css', '#'.$parameters['target']);
 
                         return $target->isVisible();
                     } catch (\Exception $e) {
@@ -576,7 +576,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function iSubmitTheForm($form)
     {
-        $this->clickOn('#ctp-' . $form . 'Form [type="submit"]');
+        $this->clickOn('#ctp-'.$form.'Form [type="submit"]');
     }
 
     /**
@@ -586,7 +586,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function iClickOnAccordion($block)
     {
-        $accordionToggle = $this->assertSession()->elementExists('css', $block . ' .accordion-toggle');
+        $accordionToggle = $this->assertSession()->elementExists('css', $block.' .accordion-toggle');
         $accordionTarget = $accordionToggle->getAttribute('data-target');
         if (!$this->assertSession()->elementExists('css', $accordionTarget)->isVisible()) {
             $accordionToggle->click();
@@ -624,10 +624,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     protected function assertCookieDuration($name, $duration)
     {
         $datetime = date('d/m/Y', $this->getSession()->getCookie($name));
-        $expectedDatetime = date('d/m/Y', strtotime('+' . $duration));
+        $expectedDatetime = date('d/m/Y', strtotime('+'.$duration));
 
         if ($datetime !== $expectedDatetime) {
-            throw new \Exception('The cookie expiration date (' . $datetime . ') is different than expected (' . $expectedDatetime . ').');
+            throw new \Exception('The cookie expiration date ('.$datetime.') is different than expected ('.$expectedDatetime.').');
         }
     }
 
@@ -636,10 +636,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function theElementIsTheLastChild($element)
     {
-        $el = $this->getSession()->getPage()->find('css', $element . ':last-child');
+        $el = $this->getSession()->getPage()->find('css', $element.':last-child');
 
         if (!($el instanceof NodeElement)) {
-            throw new ExpectationException('Element ' . $element . ' is not at last position', $this->getSession());
+            throw new ExpectationException('Element '.$element.' is not at last position', $this->getSession());
         }
     }
 
@@ -648,10 +648,10 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     public function theElementIsPlacedAfterElement($element1, $element2)
     {
-        $el = $this->getSession()->getPage()->find('css', $element2 . ' + ' . $element1);
+        $el = $this->getSession()->getPage()->find('css', $element2.' + '.$element1);
 
         if (!($el instanceof NodeElement)) {
-            throw new ExpectationException('Element ' . $element1 . ' is not placed after ' . $element2, $this->getSession());
+            throw new ExpectationException('Element '.$element1.' is not placed after '.$element2, $this->getSession());
         }
     }
 
@@ -664,6 +664,16 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     {
         if ($option !== 'default') {
             parent::selectOption($select, $option);
+        }
+    }
+
+    /**
+     * @Then the following elements should be on the page:
+     */
+    public function elementsOnPage(TableNode $table)
+    {
+        foreach ($table->getRowsHash() as $field => $value) {
+            $this->assertElementOnPage($field);
         }
     }
 
@@ -683,7 +693,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     public function fieldsHaveErrors(TableNode $table)
     {
         foreach ($table->getRowsHash() as $field => $value) {
-            $this->assertSession()->elementExists('css', '.has-error ' . $field);
+            $this->assertSession()->elementExists('css', '.has-error '.$field);
         }
     }
 
@@ -694,7 +704,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     {
         foreach ($table->getRowsHash() as $field => $value) {
             // check if field is not into .field-container.error
-            $this->assertElementNotOnPage($field . '.error');
+            $this->assertElementNotOnPage($field.'.error');
         }
     }
 
