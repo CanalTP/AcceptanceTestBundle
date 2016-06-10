@@ -283,18 +283,6 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
-     * Enable or disable JS
-     *
-     * @Given /^With(?P<suffix>(?:|out)) Javascript$/
-     */
-    public function withJavascript($suffix)
-    {
-        if ($suffix == 'out') {
-            // Use Goutte (default: Selenium)
-        }
-    }
-
-    /**
      * Using a specific screen size
      *
      * @param $screenSize
