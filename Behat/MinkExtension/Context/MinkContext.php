@@ -235,7 +235,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                 throw new \InvalidArgumentException(sprintf(
                     'Server "%s" does not exist. Available servers are: "%s".',
                     $server,
-                    implode('", "', array_keys(self::$allowed['servers']))
+                    implode('", "', array_values(self::$allowed['servers']))
                 ));
             } elseif ($server !== self::$options['server']) {
                 throw new SkippedException(
@@ -266,7 +266,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
                     throw new \InvalidArgumentException(sprintf(
                         'Locale "%s" does not exist. Available locales are: "%s".',
                         $locale,
-                        implode('", "', array_keys(self::$allowed['locales']))
+                        implode('", "', array_values(self::$allowed['locales']))
                     ));
                 }
             }
@@ -582,28 +582,32 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
-     * Wait until function
+     * Wait until function, execute a callback every 50ms
      *
-     * @param integer $timeout
-     * @param $callback
-     * @param array $parameters
+     * @param integer $timeout the timeout expressed in ms
+     * @param callable $callback the lambda to execute
+     * @param array $parameters the parameters to use for the lambda
+     *
      * @return bool
-     * @throws \Exception
+     *
+     * @throws \Exception If the execution time exceed the given timeout
      */
     protected function waitFor($timeout, $callback, $parameters = array())
     {
-        for ($i = 0; $i < $timeout; $i++) {
+        for ($i = 0; $i < $timeout; $i += $elapsedTime) {
+            $startTime = microtime(true);
             try {
                 if ($callback($this, $parameters)) {
                     return true;
                 }
             } catch (Exception $e) {
             }
-
-            sleep(1);
+            // sleeps for 50ms
+            usleep(50000);
+            $elapsedTime = microtime(true) - $startTime;
         }
 
-        throw new \Exception('Timeout thrown during the step');
+        throw new \Exception('Timeout during the step');
     }
 
     /**
