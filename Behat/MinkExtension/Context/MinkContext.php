@@ -753,7 +753,6 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
         }
     }
 
-
     /**
      * @return array all the clients given in configuration
      */
