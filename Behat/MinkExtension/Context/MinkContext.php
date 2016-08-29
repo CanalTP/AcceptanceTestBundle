@@ -742,6 +742,18 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
     }
 
     /**
+     * @Then I am on the locale :locale
+     */
+    public function iAmOnTheLocale($locale)
+    {
+        $url = parse_url($this->getSession()->getCurrentUrl());
+        $pathComponents = explode('/', $url['path']);
+        if ($pathComponents[2] != $locale) {
+            throw new ExpectationException(sprintf('Current locale is "%s", expecting "%s"', $pathComponents[2], $locale), $this->getSession()->getDriver());
+        }
+    }
+
+    /**
      * @return array all the clients given in configuration
      */
     private function getClients()
