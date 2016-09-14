@@ -72,7 +72,7 @@ class Configuration implements ConfigurationInterface
                     ->addDefaultsIfNotSet()
                     ->children()
                         ->scalarNode('client')
-                            ->defaultValue('Ctp')
+                            ->defaultValue('ctp')
                         ->end()
                         ->scalarNode('server')
                             ->defaultValue('local')
