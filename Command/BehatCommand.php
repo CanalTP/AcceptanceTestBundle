@@ -61,6 +61,7 @@ class BehatCommand extends ContainerAwareCommand
         $this->addArgument('paths', InputArgument::OPTIONAL, 'Optional path(s) to execute.');
         $this->addOption('no-jdr', null, InputOption::VALUE_OPTIONAL, 'Disables the JDR.');
         $this->addOption('trace', null, InputOption::VALUE_OPTIONAL, 'Trace output types.');
+        $this->addOption('debug', null, InputOption::VALUE_OPTIONAL, 'Saves page content on scenario fail.', false);
         foreach (self::$args as $arg) {
             $this->addOption($arg, null, InputOption::VALUE_OPTIONAL, 'Original argument "--' . $arg . '" of Behat.');
         }
@@ -88,6 +89,7 @@ class BehatCommand extends ContainerAwareCommand
         if ($input->hasParameterOption('--trace')) {
             TraceContext::$outputTypes = explode('|', $input->getParameterOption('--trace'));
         }
+        TraceContext::$enableDebug = $input->hasParameterOption('--debug');
         $args = array('behat');
         foreach (self::$args as $arg) {
             if ($input->hasParameterOption('--' . $arg)) {

@@ -30,6 +30,12 @@ class TraceContext extends BaseMinkContext
      * @var array $outputTypes
      */
     public static $outputTypes = array('html', 'png');
+
+    /**
+     * @var bool if true, output the content of the page (either a screenshot or a html dump)
+     *           if the step fails
+     */
+    public static $enableDebug = false;
     /**
      * Max length file name
      *
@@ -90,10 +96,12 @@ class TraceContext extends BaseMinkContext
      */
     public function beforeStep(BeforeStepScope $event)
     {
-        $this->stepVisits = array();
-        $this->stepVisitsNumber = 0;
-        $this->stepName = $this->getFormattedName($event->getStep()->getText(), self::$maxLengthFileName);
-        $this->stepNumber++;
+        if (self::$enableDebug) {
+            $this->stepVisits = array();
+            $this->stepVisitsNumber = 0;
+            $this->stepName = $this->getFormattedName($event->getStep()->getText(), self::$maxLengthFileName);
+            $this->stepNumber++;
+        }
     }
 
     /**
@@ -104,8 +112,10 @@ class TraceContext extends BaseMinkContext
     public function visit($page)
     {
         parent::visit($page);
-        $stepName = $this->stepNumber.'.'.++$this->stepVisitsNumber.'_'.$this->stepName;
-        $this->stepVisits = array_merge($this->stepVisits, $this->getPageContent($stepName));
+        if (self::$enableDebug) {
+            $stepName = $this->stepNumber.'.'.++$this->stepVisitsNumber.'_'.$this->stepName;
+            $this->stepVisits = array_merge($this->stepVisits, $this->getPageContent($stepName));
+        }
     }
 
     /**
@@ -114,14 +124,16 @@ class TraceContext extends BaseMinkContext
      */
     public function afterStep(AfterStepScope $event)
     {
-        if ($this->stepVisitsNumber > 1) {
-            $this->files = array_merge($this->files, $this->stepVisits);
-        } else {
-            $stepName = $this->stepNumber.'_'.$this->stepName;
-            $this->files = array_merge($this->files, $this->getPageContent($stepName));
-        }
-        if ($event->getTestResult()->getResultCode() == StepResult::FAILED) {
-            $this->scenarioStatus = StepResult::FAILED;
+        if (self::$enableDebug) {
+            if ($this->stepVisitsNumber > 1) {
+                $this->files = array_merge($this->files, $this->stepVisits);
+            } else {
+                $stepName = $this->stepNumber.'_'.$this->stepName;
+                $this->files = array_merge($this->files, $this->getPageContent($stepName));
+            }
+            if ($event->getTestResult()->getResultCode() == StepResult::FAILED) {
+                $this->scenarioStatus = StepResult::FAILED;
+            }
         }
     }
 
@@ -131,18 +143,20 @@ class TraceContext extends BaseMinkContext
      */
     public function afterScenario(AfterScenarioScope $event)
     {
-        if ($this->scenarioStatus === StepResult::FAILED) {
-            $scenarioTitle = $event->getScenario()->getTitle();
-            $folders = array(
-                $event->getSuite()->getName(),
-                $event->getFeature()->getTitle().'.'.$scenarioTitle,
-            );
-            $path = $this->getPath($folders);
-            foreach ($this->files as $file => $content) {
-                file_put_contents($path.$file, $content);
+        if (self::$enableDebug) {
+            if ($this->scenarioStatus === StepResult::FAILED) {
+                $scenarioTitle = $event->getScenario()->getTitle();
+                $folders = array(
+                    $event->getSuite()->getName(),
+                    $event->getFeature()->getTitle().'.'.$scenarioTitle,
+                );
+                $path = $this->getPath($folders);
+                foreach ($this->files as $file => $content) {
+                    file_put_contents($path.$file, $content);
+                }
+                $nbFiles = count($this->files);
+                print "Trace:\n"."- Directory: {$path}\n"."- Files: {$nbFiles}";
             }
-            $nbFiles = count($this->files);
-            print "Trace:\n"."- Directory: {$path}\n"."- Files: {$nbFiles}";
         }
     }
 
@@ -209,7 +223,7 @@ class TraceContext extends BaseMinkContext
             }
         } else {
             try {
-                $stepFiles[$stepName.'.html'] = $driver->getCurrentUrl(). '<br />' .$driver->getContent();
+                $stepFiles[$stepName.'.html'] = $driver->getCurrentUrl().'<br />'.$driver->getContent();
             } catch (DriverException $e) {
             }
         }
