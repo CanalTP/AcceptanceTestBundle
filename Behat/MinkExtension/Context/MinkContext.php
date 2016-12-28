@@ -615,6 +615,7 @@ class MinkContext extends TraceContext implements SnippetAcceptingContext, Kerne
      */
     protected function assertCookieDuration($name, $duration)
     {
+        usleep(100 * 1000); // wait 100ms to avoid reading the cookie before it is saved to the session
         $datetime = date('d/m/Y', $this->getSession()->getCookie($name));
         $expectedDatetime = date('d/m/Y', strtotime('+'.$duration));
 
